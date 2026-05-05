@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -6,793 +7,918 @@
 <title>RM Guest House</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #F4F1EB;
-    --surface: #FFFFFF;
-    --surface2: #ECE8DF;
-    --text: #1C1A16;
-    --text2: #6B6760;
-    --text3: #A09D97;
-    --border: #D8D3C8;
-    --shadow: 0 2px 12px rgba(0,0,0,0.08);
-    --shadow-lg: 0 8px 32px rgba(0,0,0,0.14);
-    --radius: 14px;
+:root {
+  --bg:#F4F1EB; --surface:#FFF; --surface2:#ECE8DF;
+  --text:#1C1A16; --text2:#6B6760; --text3:#A09D97;
+  --border:#D8D3C8; --radius:10px;
+  --shadow:0 2px 12px rgba(0,0,0,.08);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.14);
 
-    --green: #3D7A4F;    --green-bg: #D4EDDA; --green-light: #EAF5EE;
-    --red: #B84040;      --red-bg: #F5D4D4;   --red-light: #FBF0F0;
-    --violet: #6B4FA0;   --violet-bg: #E2D5F5;--violet-light: #F2ECFB;
-    --brown: #7A5C38;    --brown-bg: #EAD9C0; --brown-light: #F5EEE3;
-    --pink: #C0557A;     --pink-bg: #F5D5E2;  --pink-light: #FCF0F5;
-    --blue: #2E6FA3;     --blue-bg: #D0E6F5;  --blue-light: #EAF4FD;
-    --gray: #5A5A5A;     --gray-bg: #E0E0E0;  --gray-light: #F0F0F0;
-    --orange: #C26A1A;   --orange-bg: #FAE3C8;--orange-light: #FDF3E8;
-  }
+–green:#3D7A4F;   –green-light:#EAF5EE;  –green-bg:#D4EDDA;
+–red:#B84040;     –red-light:#FBF0F0;    –red-bg:#F5D4D4;
+–violet:#6B4FA0;  –violet-light:#F2ECFB; –violet-bg:#E2D5F5;
+–brown:#7A5C38;   –brown-light:#F5EEE3;  –brown-bg:#EAD9C0;
+–pink:#C0557A;    –pink-light:#FCF0F5;   –pink-bg:#F5D5E2;
+–blue:#2E6FA3;    –blue-light:#EAF4FD;   –blue-bg:#D0E6F5;
+–gray:#5A5A5A;    –gray-light:#F0F0F0;   –gray-bg:#E0E0E0;
+–orange:#C26A1A;  –orange-light:#FDF3E8; –orange-bg:#FAE3C8;
+–cell:88px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:‘DM Sans’,sans-serif;background:var(–bg);color:var(–text);min-height:100vh;padding-bottom:60px}
 
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+/* LOADING */
+#loading{position:fixed;inset:0;background:var(–bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999}
+.loading-logo{font-family:‘DM Serif Display’,serif;font-size:26px}.loading-logo em{color:var(–brown);font-style:normal}
+.spinner{width:30px;height:30px;border:3px solid var(–border);border-top-color:var(–brown);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding-bottom: 40px;
-  }
+/* HEADER */
+header{background:var(–surface);border-bottom:1px solid var(–border);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;box-shadow:var(–shadow)}
+.logo{font-family:‘DM Serif Display’,serif;font-size:18px}.logo em{color:var(–brown);font-style:normal}
+.hdr-right{display:flex;align-items:center;gap:10px}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(–text3);transition:background .3s}
+.sync-dot.ok{background:var(–green)}.sync-dot.saving{background:var(–orange);animation:pulse .8s infinite}.sync-dot.err{background:var(–red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.date-pill{font-size:11px;color:var(–text2);background:var(–surface2);padding:4px 11px;border-radius:20px;border:1px solid var(–border);white-space:nowrap}
 
-  /* ── HEADER ── */
-  header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 60px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: var(--shadow);
-  }
+/* TABS */
+.tabs{display:flex;background:var(–surface);border-bottom:1px solid var(–border);position:sticky;top:56px;z-index:99}
+.tab-btn{flex:1;font-family:‘DM Sans’,sans-serif;font-size:12px;font-weight:600;padding:11px 4px;border:none;background:transparent;color:var(–text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;letter-spacing:.3px}
+.tab-btn.active{color:var(–brown);border-bottom-color:var(–brown)}
 
-  .logo { font-family:'DM Serif Display',serif; font-size:19px; color:var(--text); letter-spacing:-0.2px; }
-  .logo em { color:var(--brown); font-style:normal; }
+/* FLOOR CONTAINER */
+.floor-page{display:none;padding:20px 12px}
+.floor-page.active{display:block}
 
-  .header-right { display:flex; align-items:center; gap:10px; }
+/* SCROLL WRAPPER for wide plans */
+.plan-scroll{overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
 
-  .date-pill {
-    font-size:12px; color:var(--text2); background:var(--surface2);
-    padding:5px 12px; border-radius:20px; border:1px solid var(--border); white-space:nowrap;
-  }
+/* FLOOR PLAN */
+.floor-plan{display:inline-flex;flex-direction:column;gap:12px;min-width:max-content}
+.plan-row{display:flex;align-items:stretch;gap:6px}
 
-  /* Sync indicator */
-  .sync-dot {
-    width:8px; height:8px; border-radius:50%; background:var(--text3);
-    transition: background 0.3s;
-    flex-shrink:0;
-  }
-  .sync-dot.connected { background:#3D7A4F; }
-  .sync-dot.syncing   { background:#C26A1A; animation: pulse 0.8s infinite; }
-  .sync-dot.error     { background:#B84040; }
+/* ROOM CELL */
+.room-cell{
+width:var(–cell);height:var(–cell);
+border-radius:8px;border:2px solid transparent;
+cursor:pointer;position:relative;
+display:flex;flex-direction:column;justify-content:flex-end;
+padding:5px 6px;
+transition:transform .12s,box-shadow .12s;
+-webkit-user-select:none;user-select:none;
+flex-shrink:0;
+}
+.room-cell:active{transform:scale(.95)}
+.room-cell.unconfigured{background:#F9F7F3;border:2px dashed var(–border);cursor:pointer}
+.room-cell.excluded{background:var(–bg);border:2px dashed #ccc;cursor:default;position:relative;overflow:hidden}
+.room-cell.excluded::before,.room-cell.excluded::after{content:’’;position:absolute;background:#ccc;width:120%;height:1.5px;top:50%;left:-10%;transform-origin:center}
+.room-cell.excluded::before{transform:rotate(28deg)}
+.room-cell.excluded::after{transform:rotate(-28deg)}
 
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.room-cell.green  {background:var(–green-light); border-color:var(–green)}
+.room-cell.red    {background:var(–red-light);   border-color:var(–red)}
+.room-cell.violet {background:var(–violet-light);border-color:var(–violet)}
+.room-cell.brown  {background:var(–brown-light); border-color:var(–brown)}
+.room-cell.pink   {background:var(–pink-light);  border-color:var(–pink)}
+.room-cell.blue   {background:var(–blue-light);  border-color:var(–blue)}
+.room-cell.gray   {background:var(–gray-light);  border-color:var(–gray)}
+.room-cell.orange {background:var(–orange-light);border-color:var(–orange)}
 
-  /* Loading screen */
-  #loading-screen {
-    position:fixed; inset:0; background:var(--bg);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:16px; z-index:999;
-  }
-  .loading-logo { font-family:'DM Serif Display',serif; font-size:28px; color:var(--text); }
-  .loading-logo em { color:var(--brown); font-style:normal; }
-  .loading-spinner {
-    width:32px; height:32px; border:3px solid var(--border);
-    border-top-color:var(--brown); border-radius:50%;
-    animation: spin 0.8s linear infinite;
-  }
-  .loading-text { font-size:13px; color:var(--text3); }
-  @keyframes spin { to { transform:rotate(360deg); } }
+.room-cell.has-carpet::after{
+content:’’;position:absolute;bottom:3px;left:5px;right:5px;height:3px;
+border-radius:2px;opacity:.5;
+}
+.room-cell.green.has-carpet::after  {background:var(–green)}
+.room-cell.red.has-carpet::after    {background:var(–red)}
+.room-cell.violet.has-carpet::after {background:var(–violet)}
+.room-cell.brown.has-carpet::after  {background:var(–brown)}
+.room-cell.pink.has-carpet::after   {background:var(–pink)}
+.room-cell.blue.has-carpet::after   {background:var(–blue)}
+.room-cell.gray.has-carpet::after   {background:var(–gray)}
+.room-cell.orange.has-carpet::after {background:var(–orange)}
+.room-cell.unconfigured.has-carpet::after{content:’’;position:absolute;bottom:3px;left:5px;right:5px;height:3px;border-radius:2px;background:var(–border)}
 
-  /* ── CONTAINER ── */
-  .container { max-width:700px; margin:0 auto; padding:20px 14px; }
+.cell-label{font-size:9px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;opacity:.6;line-height:1}
+.cell-name{font-size:10px;font-weight:600;color:var(–text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;margin-top:2px}
+.cell-dates{font-size:8.5px;color:var(–text3);line-height:1.2;margin-top:1px}
 
-  /* ── LEGEND ── */
-  .legend {
-    background:var(--surface); border:1px solid var(--border);
-    border-radius:var(--radius); padding:13px 16px; margin-bottom:22px;
-    display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center;
-  }
-  .legend-title { font-size:10px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--text3); width:100%; }
-  .legend-item { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text2); }
-  .legend-dot { width:13px; height:13px; border-radius:4px; flex-shrink:0; }
+.room-cell.green  .cell-label{color:var(–green)}
+.room-cell.red    .cell-label{color:var(–red)}
+.room-cell.violet .cell-label{color:var(–violet)}
+.room-cell.brown  .cell-label{color:var(–brown)}
+.room-cell.pink   .cell-label{color:var(–pink)}
+.room-cell.blue   .cell-label{color:var(–blue)}
+.room-cell.gray   .cell-label{color:var(–gray)}
+.room-cell.orange .cell-label{color:var(–orange)}
 
-  /* ── FLOOR ── */
-  .floor-section { margin-bottom:28px; }
-  .floor-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
-  .floor-title { font-family:'DM Serif Display',serif; font-size:18px; color:var(--text); }
-  .floor-badge { font-size:10px; font-weight:600; letter-spacing:0.4px; color:var(--text2); background:var(--surface2); border:1px solid var(--border); padding:3px 9px; border-radius:20px; }
-  .floor-stats { display:flex; gap:8px; flex-wrap:wrap; margin-left:auto; }
-  .stat-pill { font-size:10px; font-weight:600; padding:3px 9px; border-radius:20px; border:1px solid; }
+.timer-badge{position:absolute;top:5px;right:5px;font-size:8px;font-weight:700;background:rgba(255,255,255,.9);color:var(–violet);border:1px solid var(–violet);padding:1px 4px;border-radius:4px}
 
-  /* ── ROOMS GRID ── */
-  .rooms-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; }
+/* STAIRCASE block */
+.staircase{
+width:var(–cell);
+border-radius:8px;border:2px solid var(–border);
+background:var(–surface2);
+display:flex;align-items:center;justify-content:center;
+flex-shrink:0;
+}
+.staircase.tall{height:calc(var(–cell)*2 + 6px)}
+.staircase.normal{height:var(–cell)}
+.stair-label{font-size:10px;font-weight:700;letter-spacing:2px;color:var(–text3);writing-mode:vertical-rl;text-orientation:mixed}
 
-  /* ── ROOM CARD ── */
-  .room-card {
-    border-radius:var(--radius); border:2px solid transparent; cursor:pointer;
-    transition:transform 0.12s ease, box-shadow 0.12s ease;
-    position:relative; padding:13px 13px 30px;
-    display:flex; flex-direction:column; gap:3px;
-    min-height:100px; -webkit-user-select:none; user-select:none;
-  }
-  .room-card.emergency { min-height:84px; padding:10px 11px 26px; }
-  .room-card:active { transform:scale(0.97); }
+/* WC / label block */
+.label-cell{
+width:var(–cell);height:var(–cell);
+border-radius:8px;border:2px solid var(–border);
+background:var(–surface2);
+display:flex;align-items:center;justify-content:center;
+flex-shrink:0;
+}
+.label-cell span{font-size:11px;font-weight:700;color:var(–text3)}
 
-  .room-card.green  { background:var(--green-light);  border-color:var(--green); }
-  .room-card.red    { background:var(--red-light);    border-color:var(--red); }
-  .room-card.violet { background:var(--violet-light); border-color:var(--violet); }
-  .room-card.brown  { background:var(--brown-light);  border-color:var(--brown); }
-  .room-card.pink   { background:var(--pink-light);   border-color:var(--pink); }
-  .room-card.pink.temp-guest { border-style:dashed; }
-  .room-card.blue   { background:var(--blue-light);   border-color:var(--blue); }
-  .room-card.gray   { background:var(--gray-light);   border-color:var(--gray); }
-  .room-card.orange { background:var(--orange-light); border-color:var(--orange); }
+/* gap spacer */
+.gap{width:var(–cell);height:var(–cell);flex-shrink:0}
 
-  .room-number { font-family:'DM Serif Display',serif; font-size:19px; line-height:1; }
-  .room-card.green  .room-number { color:var(--green); }
-  .room-card.red    .room-number { color:var(--red); }
-  .room-card.violet .room-number { color:var(--violet); }
-  .room-card.brown  .room-number { color:var(--brown); }
-  .room-card.pink   .room-number { color:var(--pink); }
-  .room-card.blue   .room-number { color:var(--blue); }
-  .room-card.gray   .room-number { color:var(--gray); }
-  .room-card.orange .room-number { color:var(--orange); }
+/* STATS BAR */
+.stats-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.stat-pill{font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid}
 
-  .room-type-label { font-size:9px; font-weight:700; letter-spacing:0.6px; text-transform:uppercase; opacity:0.6; }
-  .room-card.green  .room-type-label { color:var(--green); }
-  .room-card.red    .room-type-label { color:var(--red); }
-  .room-card.violet .room-type-label { color:var(--violet); }
-  .room-card.brown  .room-type-label { color:var(--brown); }
-  .room-card.pink   .room-type-label { color:var(--pink); }
-  .room-card.blue   .room-type-label { color:var(--blue); }
-  .room-card.gray   .room-type-label { color:var(--gray); }
-  .room-card.orange .room-type-label { color:var(--orange); }
+/* LEGEND */
+.legend-row{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:20px;align-items:center}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(–text2)}
+.legend-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
 
-  .room-name { font-size:11px; font-weight:500; color:var(--text); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .room-owner-hint { font-size:10px; color:var(--pink); font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; opacity:0.8; }
-  .room-dates { font-size:10px; color:var(--text3); }
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(–surface);width:100%;max-width:520px;border-radius:22px 22px 0 0;box-shadow:0 -4px 40px rgba(0,0,0,.18);max-height:92vh;display:flex;flex-direction:column;animation:sheetUp .25s cubic-bezier(.32,1.1,.6,1)}
+@media(min-width:540px){.modal-overlay{align-items:center}.modal{border-radius:22px;max-height:88vh}}
+@keyframes sheetUp{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+.drag-handle{width:36px;height:4px;background:var(–border);border-radius:2px;margin:12px auto 0;flex-shrink:0}
+@media(min-width:540px){.drag-handle{display:none}}
+.modal-hdr{padding:14px 20px 12px;border-bottom:1px solid var(–border);display:flex;align-items:flex-start;gap:13px;flex-shrink:0}
+.modal-badge{width:42px;height:42px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:‘DM Serif Display’,serif;font-size:15px}
+.modal-title{font-family:‘DM Serif Display’,serif;font-size:17px}
+.modal-sub{font-size:11px;color:var(–text2);margin-top:2px}
+.modal-body{padding:16px 20px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:13px;-webkit-overflow-scrolling:touch}
+.modal-footer{padding:12px 20px;padding-bottom:max(12px,env(safe-area-inset-bottom));border-top:1px solid var(–border);display:flex;gap:10px;flex-shrink:0;background:var(–surface)}
 
-  .timer-badge {
-    position:absolute; top:8px; right:8px; font-size:9px; font-weight:700;
-    background:rgba(255,255,255,0.9); color:var(--violet);
-    border:1px solid var(--violet); padding:2px 5px; border-radius:5px;
-  }
+/* FIELDS */
+.field-group{display:flex;flex-direction:column;gap:5px}
+.field-label{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(–text2)}
+.field-input{background:var(–bg);border:1.5px solid var(–border);border-radius:10px;padding:10px 13px;font-family:‘DM Sans’,sans-serif;font-size:14px;color:var(–text);outline:none;transition:border-color .15s;width:100%;-webkit-appearance:none}
+.field-input:focus{border-color:var(–brown)}
+select.field-input{cursor:pointer}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.date-quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.quick-btn{font-family:‘DM Sans’,sans-serif;font-size:11px;font-weight:600;padding:6px 11px;border-radius:8px;border:1.5px solid var(–border);background:var(–surface2);color:var(–text2);cursor:pointer}
+.quick-btn:active{background:var(–border)}
 
-  .status-dot {
-    position:absolute; bottom:10px; right:11px;
-    width:9px; height:9px; border-radius:50%;
-    border:2px solid rgba(255,255,255,0.8);
-  }
-  .room-card.green  .status-dot { background:var(--green); }
-  .room-card.red    .status-dot { background:var(--red); }
-  .room-card.violet .status-dot { background:var(--violet); }
-  .room-card.brown  .status-dot { background:var(--brown); }
-  .room-card.pink   .status-dot { background:var(--pink); }
-  .room-card.blue   .status-dot { background:var(--blue); }
-  .room-card.gray   .status-dot { background:var(--gray); }
-  .room-card.orange .status-dot { background:var(--orange); }
+/* toggle row */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0}
+.toggle-label{font-size:13px;color:var(–text)}
+.toggle{width:42px;height:24px;border-radius:12px;background:var(–border);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;border:none}
+.toggle.on{background:var(–green)}
+.toggle::after{content:’’;position:absolute;width:18px;height:18px;border-radius:50%;background:white;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.on::after{transform:translateX(18px)}
 
-  /* ── MODAL ── */
-  .modal-overlay {
-    display:none; position:fixed; inset:0;
-    background:rgba(0,0,0,0.45); z-index:200;
-    align-items:flex-end; justify-content:center;
-  }
-  .modal-overlay.open { display:flex; }
+/* status buttons */
+.status-btns{display:flex;gap:8px;flex-wrap:wrap}
+.status-btn{font-family:‘DM Sans’,sans-serif;font-size:12px;font-weight:500;padding:9px 13px;border-radius:10px;border:1.5px solid var(–border);cursor:pointer;background:transparent;color:var(–text2);flex:1;min-width:70px;text-align:center;transition:all .12s}
+.status-btn.active.s-green {background:var(–green-bg); color:var(–green); border-color:var(–green); font-weight:700}
+.status-btn.active.s-red   {background:var(–red-bg);   color:var(–red);   border-color:var(–red);   font-weight:700}
 
-  .modal {
-    background:var(--surface); width:100%; max-width:520px;
-    border-radius:22px 22px 0 0;
-    box-shadow:0 -4px 40px rgba(0,0,0,0.18);
-    max-height:92vh; display:flex; flex-direction:column;
-    animation:sheetUp 0.25s cubic-bezier(.32,1.1,.6,1);
-  }
-  @media (min-width:540px) {
-    .modal-overlay { align-items:center; }
-    .modal { border-radius:22px; max-height:85vh; }
-  }
-  @keyframes sheetUp { from{transform:translateY(60px);opacity:0} to{transform:translateY(0);opacity:1} }
+/* cleaning */
+.clean-box{border-radius:12px;border:1.5px solid;padding:12px 13px}
+.clean-box.deep {border-color:var(–orange);background:var(–orange-light)}
+.clean-box.light{border-color:var(–violet);background:var(–violet-light)}
+.clean-title{font-size:11px;font-weight:700;margin-bottom:9px}
+.clean-box.deep  .clean-title{color:var(–orange)}
+.clean-box.light .clean-title{color:var(–violet)}
+.clean-item{display:flex;align-items:center;gap:9px;padding:6px 0;border-bottom:1px solid rgba(0,0,0,.06);cursor:pointer}
+.clean-item:last-child{border-bottom:none;padding-bottom:0}
+.clean-cb{width:20px;height:20px;border-radius:6px;border:2px solid;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:white;transition:all .15s}
+.clean-box.deep  .clean-cb{border-color:var(–orange)}
+.clean-box.light .clean-cb{border-color:var(–violet)}
+.clean-cb.on.deep {background:var(–orange);border-color:var(–orange)}
+.clean-cb.on.light{background:var(–violet);border-color:var(–violet)}
+.clean-lbl{font-size:13px;color:var(–text)}
+.clean-lbl.done{text-decoration:line-through;color:var(–text3)}
+.clean-done-btn{width:100%;margin-top:11px;font-family:‘DM Sans’,sans-serif;font-size:12px;font-weight:700;padding:10px;border-radius:9px;border:none;cursor:pointer;color:white}
+.clean-box.deep  .clean-done-btn{background:var(–orange)}
+.clean-box.light .clean-done-btn{background:var(–violet)}
 
-  .modal-drag-handle { width:36px; height:4px; background:var(--border); border-radius:2px; margin:12px auto 0; flex-shrink:0; }
-  @media (min-width:540px) { .modal-drag-handle { display:none; } }
+/* restore */
+.restore-box{background:var(–pink-light);border:1.5px solid var(–pink);border-radius:11px;padding:11px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.restore-lbl{font-size:12px;color:var(–pink)}
+.restore-lbl strong{font-weight:700}
+.restore-btn{font-family:‘DM Sans’,sans-serif;font-size:12px;font-weight:700;padding:7px 13px;border-radius:9px;border:none;background:var(–pink);color:white;cursor:pointer;white-space:nowrap}
 
-  .modal-header { padding:14px 20px 12px; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; gap:13px; flex-shrink:0; }
-  .modal-color-badge { width:42px; height:42px; border-radius:11px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-family:'DM Serif Display',serif; font-size:17px; }
-  .modal-title { font-family:'DM Serif Display',serif; font-size:17px; }
-  .modal-subtitle { font-size:11px; color:var(--text2); margin-top:2px; }
+.info-note{font-size:11px;color:var(–text3);background:var(–surface2);border-radius:9px;padding:8px 12px;border:1px solid var(–border);line-height:1.55}
 
-  .modal-body { padding:16px 20px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:14px; -webkit-overflow-scrolling:touch; }
+/* section header inside modal */
+.section-sep{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(–text3);padding-bottom:4px;border-bottom:1px solid var(–border)}
 
-  /* ── CLEANING ── */
-  .cleaning-box { border-radius:12px; border:1.5px solid; padding:13px 14px; }
-  .cleaning-box.deep  { border-color:var(--orange); background:var(--orange-light); }
-  .cleaning-box.light { border-color:var(--violet); background:var(--violet-light); }
+.btn-cancel{font-family:‘DM Sans’,sans-serif;font-size:14px;font-weight:500;padding:11px 16px;border-radius:11px;border:1.5px solid var(–border);background:transparent;color:var(–text2);cursor:pointer}
+.btn-save  {font-family:‘DM Sans’,sans-serif;font-size:14px;font-weight:600;padding:11px;border-radius:11px;border:none;background:var(–text);color:white;cursor:pointer;flex:1}
+.btn-save:active{background:#2d2b25}
+.btn-danger{font-family:‘DM Sans’,sans-serif;font-size:12px;font-weight:600;padding:11px 14px;border-radius:11px;border:1.5px solid var(–red);background:transparent;color:var(–red);cursor:pointer}
 
-  .cleaning-title { font-size:12px; font-weight:700; letter-spacing:0.4px; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
-  .cleaning-box.deep  .cleaning-title { color:var(--orange); }
-  .cleaning-box.light .cleaning-title { color:var(--violet); }
-
-  .clean-item { display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid rgba(0,0,0,0.06); cursor:pointer; }
-  .clean-item:last-child { border-bottom:none; padding-bottom:0; }
-
-  .clean-cb { width:20px; height:20px; border-radius:6px; border:2px solid; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all 0.15s; font-size:12px; color:white; }
-  .cleaning-box.deep  .clean-cb { border-color:var(--orange); }
-  .cleaning-box.light .clean-cb { border-color:var(--violet); }
-  .clean-cb.checked.deep  { background:var(--orange); border-color:var(--orange); }
-  .clean-cb.checked.light { background:var(--violet); border-color:var(--violet); }
-
-  .clean-label { font-size:13px; color:var(--text); }
-  .clean-label.done { text-decoration:line-through; color:var(--text3); }
-
-  .cleaning-done-btn { width:100%; margin-top:12px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; padding:11px; border-radius:10px; border:none; cursor:pointer; transition:all 0.15s; color:white; }
-  .cleaning-box.deep  .cleaning-done-btn { background:var(--orange); }
-  .cleaning-box.light .cleaning-done-btn { background:var(--violet); }
-  .cleaning-box.deep  .cleaning-done-btn:active { background:#a0551a; }
-  .cleaning-box.light .cleaning-done-btn:active { background:#5a3f88; }
-
-  /* ── FIELDS ── */
-  .field-group { display:flex; flex-direction:column; gap:5px; }
-  .field-label { font-size:10px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:var(--text2); }
-
-  .field-input {
-    background:var(--bg); border:1.5px solid var(--border); border-radius:10px;
-    padding:11px 13px; font-family:'DM Sans',sans-serif; font-size:15px; color:var(--text);
-    outline:none; transition:border-color 0.15s; width:100%;
-    -webkit-appearance:none; appearance:none;
-  }
-  .field-input:focus { border-color:var(--brown); }
-
-  .field-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-
-  .date-quick-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
-
-  .quick-btn {
-    font-family:'DM Sans',sans-serif; font-size:11px; font-weight:600;
-    padding:6px 12px; border-radius:8px; border:1.5px solid var(--border);
-    background:var(--surface2); color:var(--text2); cursor:pointer; transition:all 0.12s; white-space:nowrap;
-  }
-  .quick-btn:active { background:var(--border); }
-
-  .status-buttons { display:flex; gap:8px; flex-wrap:wrap; }
-  .status-btn {
-    font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500;
-    padding:10px 14px; border-radius:10px; border:1.5px solid var(--border);
-    cursor:pointer; transition:all 0.12s; background:transparent; color:var(--text2);
-    flex:1; min-width:80px; text-align:center;
-  }
-  .status-btn.active.s-green { background:var(--green-bg); color:var(--green); border-color:var(--green); font-weight:700; }
-  .status-btn.active.s-red   { background:var(--red-bg);   color:var(--red);   border-color:var(--red);   font-weight:700; }
-
-  .restore-section { background:var(--pink-light); border:1.5px solid var(--pink); border-radius:11px; padding:11px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
-  .restore-label { font-size:12px; color:var(--pink); }
-  .restore-label strong { font-weight:700; }
-  .restore-btn { font-family:'DM Sans',sans-serif; font-size:12px; font-weight:700; padding:8px 14px; border-radius:9px; border:none; background:var(--pink); color:white; cursor:pointer; transition:all 0.12s; white-space:nowrap; flex-shrink:0; }
-  .restore-btn:active { background:#a8446a; }
-
-  .info-note { font-size:11px; color:var(--text3); background:var(--surface2); border-radius:9px; padding:9px 12px; border:1px solid var(--border); line-height:1.55; }
-
-  /* ── FOOTER ── */
-  .modal-footer {
-    padding:12px 20px;
-    padding-bottom:max(12px, env(safe-area-inset-bottom));
-    border-top:1px solid var(--border); display:flex; gap:10px; flex-shrink:0; background:var(--surface);
-  }
-  .btn-cancel { font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; padding:12px 18px; border-radius:11px; border:1.5px solid var(--border); background:transparent; color:var(--text2); cursor:pointer; }
-  .btn-save   { font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600; padding:12px; border-radius:11px; border:none; background:var(--text); color:white; cursor:pointer; flex:1; }
-  .btn-save:active { background:#2d2b25; }
-
-  /* ── TOAST ── */
-  .toast {
-    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px);
-    background:var(--text); color:white; padding:11px 20px; border-radius:24px;
-    font-size:13px; font-weight:500; box-shadow:0 4px 20px rgba(0,0,0,0.2);
-    z-index:999; opacity:0; transition:transform 0.25s ease, opacity 0.25s ease; white-space:nowrap;
-  }
-  .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(–text);color:white;padding:10px 20px;border-radius:24px;font-size:12px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:999;opacity:0;transition:transform .25s,opacity .25s;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 </style>
+
 </head>
 <body>
 
-<!-- LOADING SCREEN -->
-<div id="loading-screen">
+<div id="loading">
   <div class="loading-logo">RM <em>Guest House</em></div>
-  <div class="loading-spinner"></div>
-  <div class="loading-text">Connecting…</div>
+  <div class="spinner"></div>
+  <div style="font-size:12px;color:var(--text3)">Connecting…</div>
 </div>
 
 <header>
   <div class="logo">RM <em>Guest House</em></div>
-  <div class="header-right">
-    <div class="sync-dot" id="sync-dot" title="Connection status"></div>
-    <div class="date-pill" id="date-display"></div>
+  <div class="hdr-right">
+    <div class="sync-dot" id="sync-dot"></div>
+    <div class="date-pill" id="date-pill"></div>
   </div>
 </header>
 
-<div class="container">
-  <div class="legend">
-    <div class="legend-title">Legend</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--green-light);border:2px solid var(--green)"></div> Available</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--red-light);border:2px solid var(--red)"></div> Occupied</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--orange-light);border:2px solid var(--orange)"></div> Deep clean needed</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--violet-light);border:2px solid var(--violet)"></div> Light clean (2 weeks)</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--brown-light);border:2px solid var(--brown)"></div> Fixed (seminarians/students)</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--pink-light);border:2px solid var(--pink)"></div> Priest room</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--blue-light);border:2px solid var(--blue)"></div> Annual itinerancy</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--gray-light);border:2px solid var(--gray)"></div> Fixed resident</div>
-  </div>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('f1')">1st Floor</button>
+  <button class="tab-btn" onclick="switchTab('f2')">2nd Floor</button>
+  <button class="tab-btn" onclick="switchTab('sisters')">Sisters</button>
+</div>
 
-  <div class="floor-section">
-    <div class="floor-header">
-      <div class="floor-title">First Floor</div>
-      <div class="floor-badge">7 rooms</div>
-      <div class="floor-stats" id="stats-f1"></div>
-    </div>
-    <div class="rooms-grid" id="grid-f1"></div>
-  </div>
+<!-- ═══════════════════════════════════════════════════════ FIRST FLOOR -->
 
-  <div class="floor-section">
-    <div class="floor-header">
-      <div class="floor-title">Second Floor</div>
-      <div class="floor-badge">15 rooms</div>
-      <div class="floor-stats" id="stats-f2"></div>
-    </div>
-    <div class="rooms-grid" id="grid-f2"></div>
+<div class="floor-page active" id="page-f1">
+  <div class="stats-bar" id="stats-f1"></div>
+  <div class="legend-row">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green-light);border:2px solid var(--green)"></div>Available</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red-light);border:2px solid var(--red)"></div>Occupied / To clean</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--violet-light);border:2px solid var(--violet)"></div>Needs refreshing</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--pink-light);border:2px solid var(--pink)"></div>Priest</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--blue-light);border:2px solid var(--blue)"></div>Emergency</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--brown-light);border:2px solid var(--brown)"></div>Fixed</div>
+  </div>
+  <div class="plan-scroll">
+    <div class="floor-plan" id="plan-f1"></div>
   </div>
 </div>
 
-<!-- MODAL -->
+<!-- ═══════════════════════════════════════════════════════ SECOND FLOOR -->
+
+<div class="floor-page" id="page-f2">
+  <div class="stats-bar" id="stats-f2"></div>
+  <div class="plan-scroll">
+    <div class="floor-plan" id="plan-f2"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ SISTERS -->
+
+<div class="floor-page" id="page-sisters">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:12px;text-align:center">
+    <div style="font-size:40px">🏠</div>
+    <div style="font-family:'DM Serif Display',serif;font-size:20px">Sisters Floor</div>
+    <div style="font-size:13px;color:var(--text2)">Coming soon — send the floor plan and we'll build it!</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ MODAL -->
+
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
-    <div class="modal-drag-handle"></div>
-    <div class="modal-header">
-      <div class="modal-color-badge" id="m-badge"></div>
-      <div>
+    <div class="drag-handle"></div>
+    <div class="modal-hdr">
+      <div class="modal-badge" id="m-badge"></div>
+      <div style="flex:1;min-width:0">
         <div class="modal-title" id="m-title"></div>
-        <div class="modal-subtitle" id="m-subtitle"></div>
+        <div class="modal-sub" id="m-sub"></div>
       </div>
     </div>
-    <div class="modal-body">
-      <div id="status-group" style="display:none">
-        <div class="field-label" style="margin-bottom:7px">Status</div>
-        <div class="status-buttons">
-          <button class="status-btn s-green" onclick="setStatus('green')" id="btn-green">✓ Available</button>
-          <button class="status-btn s-red"   onclick="setStatus('red')"   id="btn-red">● Occupied</button>
-        </div>
-      </div>
-      <div class="cleaning-box deep" id="clean-deep" style="display:none">
-        <div class="cleaning-title">🧹 Deep Cleaning Required</div>
-        <div id="deep-items"></div>
-        <button class="cleaning-done-btn" onclick="markCleaningDone('deep')">✓ Cleaning complete — mark as available</button>
-      </div>
-      <div class="cleaning-box light" id="clean-light" style="display:none">
-        <div class="cleaning-title">🪣 Light Cleaning Required</div>
-        <div id="light-items"></div>
-        <button class="cleaning-done-btn" onclick="markCleaningDone('light')">✓ Done — mark as available</button>
-      </div>
-      <div class="restore-section" id="restore-group" style="display:none">
-        <div class="restore-label">Permanent occupant: <strong id="restore-owner-name"></strong></div>
-        <button class="restore-btn" onclick="restoreOwner()">↩ Restore</button>
-      </div>
-      <div class="field-group" id="guest-group" style="display:none">
-        <div class="field-label">Occupant name</div>
-        <input class="field-input" id="m-guest" type="text" placeholder="First and last name..." autocomplete="off">
-      </div>
-      <div id="dates-section" style="display:none">
-        <div class="field-label" style="margin-bottom:6px">Stay period</div>
-        <div class="field-row">
-          <div class="field-group">
-            <div class="field-label">From</div>
-            <input class="field-input" id="m-from" type="date">
-          </div>
-          <div class="field-group">
-            <div class="field-label">To</div>
-            <input class="field-input" id="m-to" type="date">
-          </div>
-        </div>
-        <div class="date-quick-row">
-          <button class="quick-btn" onclick="setFullYear()">📅 Full year</button>
-          <button class="quick-btn" onclick="setFromToday()">📅 From today</button>
-        </div>
-      </div>
-      <div class="field-group">
-        <div class="field-label">Notes</div>
-        <input class="field-input" id="m-notes" type="text" placeholder="Additional notes..." autocomplete="off">
-      </div>
-      <div class="info-note" id="m-info" style="display:none"></div>
-    </div>
+    <div class="modal-body" id="modal-body"></div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-      <button class="btn-save" onclick="saveRoom()">Save</button>
+      <button class="btn-save" id="btn-save" onclick="saveRoom()">Save</button>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, onValue, connectDatabaseEmulator }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// ── FIREBASE CONFIG ────────────────────────────────────
 const firebaseConfig = {
-  apiKey: "AIzaSyDkcw4HhYnXotrbuyvD84ONvTJrbbxxAhg",
-  authDomain: "rm-guest-room.firebaseapp.com",
-  projectId: "rm-guest-room",
-  storageBucket: "rm-guest-room.firebasestorage.app",
-  messagingSenderId: "410582754379",
-  appId: "1:410582754379:web:c5937416c15514a18699ce",
-  databaseURL: "https://rm-guest-room-default-rtdb.europe-west1.firebasedatabase.app"
+  apiKey:"AIzaSyDkcw4HhYnXotrbuyvD84ONvTJrbbxxAhg",
+  authDomain:"rm-guest-room.firebaseapp.com",
+  projectId:"rm-guest-room",
+  storageBucket:"rm-guest-room.firebasestorage.app",
+  messagingSenderId:"410582754379",
+  appId:"1:410582754379:web:c5937416c15514a18699ce",
+  databaseURL:"https://rm-guest-room-default-rtdb.europe-west1.firebasedatabase.app"
 };
 
 const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
-const roomsRef = ref(db, 'rooms');
+const dbRef = ref(db,'rooms_v2');
 
-// ── CONSTANTS ──────────────────────────────────────────
-const TWO_WEEKS_MS = 14 * 24 * 60 * 60 * 1000;
+// ── CONSTANTS ─────────────────────────────────────────────
+const TWO_WEEKS = 14*24*60*60*1000;
 
-const DEEP_CLEAN_ITEMS  = ['Vacuum the floor','Dust all surfaces','Clean surfaces & desk','Change bed linen & make bed','Change towel','Refill soap / check toiletries'];
-const LIGHT_CLEAN_ITEMS = ['Dust all surfaces'];
+const DEEP_ITEMS  = ['Vacuum the floor','Dust all surfaces','Clean surfaces & desk','Change bed linen & make bed','Change towel','Refill soap / toiletries'];
+const LIGHT_ITEMS = ['Dust all surfaces'];
 
-const ROOM_DEFAULTS = [
-  { id:'f1-1',  floor:1, label:'1-A', fixedType:'Itinerancy', type:'blue',  fixedColor:true,  canEdit:['guest','dates','notes'],          occupant:'',           owner:null,              from:'', to:'', notes:'', greenSince:null },
-  { id:'f1-2',  floor:1, label:'1-B', fixedType:'Itinerancy', type:'blue',  fixedColor:true,  canEdit:['guest','dates','notes'],          occupant:'',           owner:null,              from:'', to:'', notes:'', greenSince:null },
-  { id:'f1-3',  floor:1, label:'1-C', fixedType:'Normal',     type:'green', fixedColor:false, canEdit:['status','guest','dates','notes'], occupant:'',           owner:null,              from:'', to:'', notes:'', greenSince:Date.now() },
-  { id:'f1-4',  floor:1, label:'1-D', fixedType:'Normal',     type:'green', fixedColor:false, canEdit:['status','guest','dates','notes'], occupant:'',           owner:null,              from:'', to:'', notes:'', greenSince:Date.now() },
-  { id:'f1-5',  floor:1, label:'1-E', fixedType:'Priest',     type:'pink',  fixedColor:true,  canEdit:['guest','dates','notes'],          occupant:'Fr. Mario',  owner:'Fr. Mario',       from:'', to:'', notes:'', greenSince:null },
-  { id:'f1-6',  floor:1, label:'1-F', fixedType:'Priest',     type:'pink',  fixedColor:true,  canEdit:['guest','dates','notes'],          occupant:'Fr. Luigi',  owner:'Fr. Luigi',       from:'', to:'', notes:'', greenSince:null },
-  { id:'f1-7',  floor:1, label:'1-G', fixedType:'Priest',     type:'pink',  fixedColor:true,  canEdit:['guest','dates','notes'],          occupant:'Fr. Carlo',  owner:'Fr. Carlo',       from:'', to:'', notes:'', greenSince:null },
-  { id:'f2-1',  floor:2, label:'2-A', fixedType:'Seminarian', type:'brown', fixedColor:true,  canEdit:['guest','notes'],                 occupant:'Seminarian 1', owner:null,            from:'', to:'', notes:'', greenSince:null },
-  { id:'f2-2',  floor:2, label:'2-B', fixedType:'Seminarian', type:'brown', fixedColor:true,  canEdit:['guest','notes'],                 occupant:'Seminarian 2', owner:null,            from:'', to:'', notes:'', greenSince:null },
-  { id:'f2-3',  floor:2, label:'2-C', fixedType:'Seminarian', type:'brown', fixedColor:true,  canEdit:['guest','notes'],                 occupant:'Seminarian 3', owner:null,            from:'', to:'', notes:'', greenSince:null },
-  { id:'f2-4',  floor:2, label:'2-D', fixedType:'Seminarian', type:'brown', fixedColor:true,  canEdit:['guest','notes'],                 occupant:'Seminarian 4', owner:null,            from:'', to:'', notes:'', greenSince:null },
-  { id:'f2-5',  floor:2, label:'2-E', fixedType:'Seminarian', type:'brown', fixedColor:true,  canEdit:['guest','notes'],                 occupant:'Seminarian 5', owner:null,            from:'', to:'', notes:'', greenSince:null },
-  { id:'f2-6',  floor:2, label:'2-F', fixedType:'Seminarian', type:'brown', fixedColor:true,  canEdit:['guest','notes'],                 occupant:'Seminarian 6', owner:null,            from:'', to:'', notes:'', greenSince:null },
-  { id:'f2-7',  floor:2, label:'2-G', fixedType:'Seminarian', type:'brown', fixedColor:true,  canEdit:['guest','notes'],                 occupant:'Seminarian 7', owner:null,            from:'', to:'', notes:'', greenSince:null },
-  { id:'f2-8',  floor:2, label:'2-H', fixedType:'Student',    type:'brown', fixedColor:true,  canEdit:['guest','notes'],                 occupant:'Student 1',    owner:null,            from:'', to:'', notes:'', greenSince:null },
-  { id:'f2-9',  floor:2, label:'2-I', fixedType:'Student',    type:'brown', fixedColor:true,  canEdit:['guest','notes'],                 occupant:'Student 2',    owner:null,            from:'', to:'', notes:'', greenSince:null },
-  { id:'f2-10', floor:2, label:'2-L', fixedType:'Sem. Itin.', type:'pink',  fixedColor:true,  canEdit:['guest','notes'],                 occupant:'Sem. Itinerancy', owner:'Sem. Itinerancy', from:'', to:'', notes:'', greenSince:null },
-  { id:'f2-11', floor:2, label:'2-M', fixedType:'Normal',     type:'green', fixedColor:false, canEdit:['status','guest','dates','notes'], occupant:'',           owner:null,              from:'', to:'', notes:'', greenSince:Date.now() },
-  { id:'f2-12', floor:2, label:'2-N', fixedType:'Normal',     type:'green', fixedColor:false, canEdit:['status','guest','dates','notes'], occupant:'',           owner:null,              from:'', to:'', notes:'', greenSince:Date.now() },
-  { id:'f2-13', floor:2, label:'2-O', fixedType:'Emergency',  type:'green', fixedColor:false, canEdit:['status','guest','dates','notes'], emergency:true, occupant:'', owner:null, from:'', to:'', notes:'', greenSince:Date.now() },
-  { id:'f2-14', floor:2, label:'2-P', fixedType:'Emergency',  type:'green', fixedColor:false, canEdit:['status','guest','dates','notes'], emergency:true, occupant:'', owner:null, from:'', to:'', notes:'', greenSince:Date.now() },
-  { id:'f2-15', floor:2, label:'2-Q', fixedType:'Resident',   type:'gray',  fixedColor:true,  canEdit:['notes'],                         occupant:'Marco',      owner:null,              from:'', to:'', notes:'', greenSince:null },
+const TYPE_COLOR = {
+  normal:'green', priest:'pink', fixed:'brown', emergency:'blue',
+  resident:'gray', itinerancy:'blue'
+};
+
+const COLOR_LABEL = {
+  green:'Available', red:'Occupied', orange:'Deep clean', violet:'Refreshing needed',
+  brown:'Fixed', pink:'Priest', blue:'Emergency / Itinerancy', gray:'Resident', unconfigured:'Not configured'
+};
+
+// ── FLOOR LAYOUT DEFINITIONS ──────────────────────────────
+// Each cell: { id, kind:'room'|'stair'|'label'|'excluded'|'gap', ...roomProps }
+// Rows define visual rows in the plan
+
+const F1_LAYOUT = [
+  // ROW 0 (top): left block + stairs + right block top
+  { row:0, cells:[
+    { id:'f1-L1', kind:'room' },
+    { id:'f1-L2', kind:'room' },
+    { kind:'stair', rows:2, id:'stair-f1' },
+    { id:'f1-R1', kind:'room', defaultType:'priest', defaultName:'Fr. A', owner:'Fr. A' },
+    { id:'f1-R2', kind:'room' },
+    { id:'f1-R3', kind:'room' },
+  ]},
+  // ROW 1 (bottom): left block + right block bottom
+  { row:1, cells:[
+    { id:'f1-L3', kind:'room' },
+    { id:'f1-L4', kind:'room' },
+    // stair continues (tall, rendered in row 0)
+    { id:'f1-R4', kind:'room', defaultType:'priest', defaultName:'Fr. G', owner:'Fr. G' },
+    { id:'f1-R5', kind:'room' },
+    { kind:'excluded' },
+  ]},
 ];
 
-// ── STATE ──────────────────────────────────────────────
-let rooms = [];
-let currentRoom = null;
-let cleaningState = {};
-let initialized = false;
+const F2_LAYOUT = [
+  // ROW 0 (top corridor)
+  { row:0, cells:[
+    { id:'f2-T1', kind:'room', defaultType:'emergency' },
+    { id:'f2-T2', kind:'label', label:'ART\nROOM' },
+    { kind:'stair', rows:2, id:'stair-f2' },
+    { id:'f2-T3', kind:'room', defaultType:'emergency' },
+    { id:'f2-T4', kind:'room' },
+    { id:'f2-T5', kind:'room' },
+    { id:'f2-T6', kind:'room' },
+    { id:'f2-T7', kind:'room' },
+    { id:'f2-T8', kind:'room' },
+    { kind:'label', label:'WC' },
+    { kind:'stair', rows:1, id:'stair-f2b' },
+  ]},
+  // ROW 1 (bottom corridor)
+  { row:1, cells:[
+    { id:'f2-B1', kind:'room', defaultType:'fixed', defaultName:'Bob', defaultNote:'1 year' },
+    { id:'f2-B2', kind:'room' },
+    // stair continues
+    { id:'f2-B3', kind:'room' },
+    { id:'f2-B4', kind:'room' },
+    { id:'f2-B5', kind:'room' },
+    { id:'f2-B6', kind:'room' },
+    { id:'f2-B7', kind:'room' },
+    { id:'f2-B8', kind:'room' },
+    { id:'f2-B9', kind:'room' },
+    { id:'f2-B10', kind:'room' },
+  ]},
+];
 
-// ── SYNC INDICATOR ─────────────────────────────────────
-const syncDot = document.getElementById('sync-dot');
-function setSyncStatus(s) {
-  syncDot.className = 'sync-dot ' + s;
+// Collect all room IDs for defaults
+function allRoomDefs() {
+  const rooms = [];
+  [F1_LAYOUT, F2_LAYOUT].forEach((layout, fi) => {
+    layout.forEach(row => {
+      row.cells.forEach(c => {
+        if (c.kind === 'room') rooms.push({ floor: fi===0?'f1':'f2', ...c });
+      });
+    });
+  });
+  return rooms;
 }
 
-// ── FIREBASE LISTENER (real-time) ──────────────────────
-onValue(roomsRef, (snapshot) => {
-  const data = snapshot.val();
+// ── STATE ─────────────────────────────────────────────────
+let rooms = {};      // id → room object
+let currentId = null;
+let initialized = false;
+let cleanState = {};
 
+// ── FIREBASE ──────────────────────────────────────────────
+const syncDot = document.getElementById('sync-dot');
+function setSyncStatus(s){ syncDot.className='sync-dot '+(s==='connected'?'ok':s==='saving'?'saving':'err'); }
+
+onValue(dbRef, snap => {
+  const data = snap.val();
   if (!data) {
-    // First time — write defaults to Firebase
+    // First run: write defaults
     const defaults = {};
-    ROOM_DEFAULTS.forEach(r => { defaults[r.id] = r; });
-    set(roomsRef, defaults);
+    allRoomDefs().forEach(def => {
+      defaults[def.id] = makeDefault(def);
+    });
+    set(dbRef, defaults);
     return;
   }
 
-  // Merge Firebase data with local defaults (preserves canEdit, fixedColor etc.)
-  rooms = ROOM_DEFAULTS.map(def => {
+  // Merge: keep structural props from code, data props from Firebase
+  rooms = {};
+  allRoomDefs().forEach(def => {
     const saved = data[def.id] || {};
-    return {
-      ...def,
-      type:       saved.type       ?? def.type,
-      occupant:   saved.occupant   ?? def.occupant,
-      from:       saved.from       ?? def.from,
-      to:         saved.to         ?? def.to,
-      notes:      saved.notes      ?? def.notes,
-      greenSince: saved.greenSince ?? def.greenSince,
+    rooms[def.id] = {
+      ...makeDefault(def),
+      // overwrite with saved values
+      type:        saved.type        ?? (def.defaultType ? TYPE_COLOR[def.defaultType]||'green' : 'unconfigured'),
+      roomType:    saved.roomType    ?? def.defaultType ?? null,
+      name:        saved.name        ?? def.defaultName ?? '',
+      owner:       saved.owner       ?? def.owner       ?? null,
+      from:        saved.from        ?? '',
+      to:          saved.to          ?? '',
+      notes:       saved.notes       ?? def.defaultNote ?? '',
+      carpet:      saved.carpet      ?? false,
+      greenSince:  saved.greenSince  ?? null,
+      configured:  saved.configured  ?? (!!def.defaultType),
     };
   });
 
-  checkTimers(false); // check without re-saving unless needed
+  checkTimers();
   renderAll();
   setSyncStatus('connected');
-
-  if (!initialized) {
-    document.getElementById('loading-screen').style.display = 'none';
+  if (!initialized){
+    document.getElementById('loading').style.display='none';
     initialized = true;
   }
-}, (error) => {
-  setSyncStatus('error');
-  console.error('Firebase error:', error);
-});
+}, err => { setSyncStatus('error'); console.error(err); });
 
-// ── SAVE TO FIREBASE ───────────────────────────────────
-function saveRoom_db(room) {
-  setSyncStatus('syncing');
-  const payload = {
-    type:       room.type,
-    occupant:   room.occupant,
-    from:       room.from,
-    to:         room.to,
-    notes:      room.notes,
-    greenSince: room.greenSince,
+function makeDefault(def){
+  const color = def.defaultType ? (TYPE_COLOR[def.defaultType]||'green') : 'unconfigured';
+  return {
+    id: def.id, floor: def.floor,
+    type: color, roomType: def.defaultType||null,
+    name: def.defaultName||'', owner: def.owner||null,
+    from:'', to:'', notes: def.defaultNote||'',
+    carpet:false, greenSince: color==='green' ? Date.now() : null,
+    configured: !!def.defaultType,
   };
-  set(ref(db, 'rooms/' + room.id), { ...ROOM_DEFAULTS.find(d=>d.id===room.id), ...payload })
-    .then(() => setSyncStatus('connected'))
-    .catch(() => setSyncStatus('error'));
 }
 
-// ── TIMERS ─────────────────────────────────────────────
-function checkTimers(andSave = true) {
+function saveRoomDb(r){
+  setSyncStatus('saving');
+  set(ref(db,'rooms_v2/'+r.id), r)
+    .then(()=>setSyncStatus('connected'))
+    .catch(()=>setSyncStatus('error'));
+}
+
+// ── TIMERS ────────────────────────────────────────────────
+function checkTimers(){
   const now = Date.now();
-  rooms.forEach(r => {
-    if (r.type === 'green' && r.greenSince && !r.fixedColor && (now - r.greenSince >= TWO_WEEKS_MS)) {
-      r.type = 'violet'; r.greenSince = null;
-      if (andSave) saveRoom_db(r);
+  Object.values(rooms).forEach(r => {
+    // Green → Violet after 2 weeks
+    if(r.type==='green' && r.greenSince && (now - r.greenSince >= TWO_WEEKS)){
+      r.type='violet'; r.greenSince=null; saveRoomDb(r);
+    }
+    // Occupied → Red (needs deep clean) after end date
+    if(r.type==='red-occupied' && r.to){
+      const endDate = new Date(r.to+'T23:59:59').getTime();
+      if(now > endDate){
+        r.type='orange'; saveRoomDb(r);
+      }
     }
   });
 }
 
-function daysLeft(r) {
-  if (r.type !== 'green' || !r.greenSince || r.fixedColor) return null;
-  const rem = TWO_WEEKS_MS - (Date.now() - r.greenSince);
-  return rem <= 0 ? 0 : Math.ceil(rem / 86400000);
+function daysLeft(r){
+  if(r.type!=='green'||!r.greenSince) return null;
+  const rem = TWO_WEEKS-(Date.now()-r.greenSince);
+  return rem<=0?0:Math.ceil(rem/86400000);
 }
 
-// ── HELPERS ────────────────────────────────────────────
-const C = {
-  bg:  {green:'var(--green-bg)',red:'var(--red-bg)',violet:'var(--violet-bg)',orange:'var(--orange-bg)',brown:'var(--brown-bg)',pink:'var(--pink-bg)',blue:'var(--blue-bg)',gray:'var(--gray-bg)'},
-  txt: {green:'var(--green)',  red:'var(--red)',  violet:'var(--violet)',  orange:'var(--orange)',  brown:'var(--brown)',  pink:'var(--pink)',  blue:'var(--blue)',  gray:'var(--gray)'},
-};
+// ── HELPERS ───────────────────────────────────────────────
+const BG  = {green:'var(--green-light)',red:'var(--red-light)',orange:'var(--orange-light)',violet:'var(--violet-light)',brown:'var(--brown-light)',pink:'var(--pink-light)',blue:'var(--blue-light)',gray:'var(--gray-light)',unconfigured:'#F9F7F3','red-occupied':'var(--red-light)'};
+const CLR = {green:'var(--green)',red:'var(--red)',orange:'var(--orange)',violet:'var(--violet)',brown:'var(--brown)',pink:'var(--pink)',blue:'var(--blue)',gray:'var(--gray)',unconfigured:'var(--text3)','red-occupied':'var(--red)'};
+const BDCLR = {green:'var(--green)',red:'var(--red)',orange:'var(--orange)',violet:'var(--violet)',brown:'var(--brown)',pink:'var(--pink)',blue:'var(--blue)',gray:'var(--gray)',unconfigured:'var(--border)','red-occupied':'var(--red)'};
 
-function isPriestRoom(r) { return r.fixedType==='Priest'||r.fixedType==='Sem. Itin.'; }
-function hasTempGuest(r) { return isPriestRoom(r)&&r.owner&&r.occupant!==r.owner; }
-function isNormalRoom(r) { return !r.fixedColor; }
+function fmtDate(s){ if(!s)return''; return new Date(s+'T12:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit'}); }
+function todayStr(){ return new Date().toISOString().split('T')[0]; }
+function oneYearFrom(s){ const d=new Date((s||todayStr())+'T12:00:00'); d.setFullYear(d.getFullYear()+1); d.setDate(d.getDate()-1); return d.toISOString().split('T')[0]; }
 
-function fmtDate(s) {
-  if (!s) return '';
-  return new Date(s+'T12:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit'});
-}
-function todayStr() { return new Date().toISOString().split('T')[0]; }
-function oneYearFrom(s) {
-  const d = new Date((s||todayStr())+'T12:00:00');
-  d.setFullYear(d.getFullYear()+1); d.setDate(d.getDate()-1);
-  return d.toISOString().split('T')[0];
-}
+function isPriestRoom(r){ return r.roomType==='priest'; }
 
-// ── RENDER ─────────────────────────────────────────────
-function renderRoom(r) {
-  const card = document.createElement('div');
-  const tempGuest = hasTempGuest(r);
-  card.className = `room-card ${r.type}${r.emergency?' emergency':''}${tempGuest?' temp-guest':''}`;
-  card.onclick = () => openModal(r.id);
-
-  const dl = daysLeft(r);
-  const timerHtml = (dl!==null&&dl<=7)?`<div class="timer-badge">${dl}d</div>`:'';
-  const nameDisplay = r.occupant||(r.type==='green'?'Available':'—');
-  const datesHtml = (r.from&&r.to)?`<div class="room-dates">${fmtDate(r.from)} → ${fmtDate(r.to)}</div>`:
-                    (r.from?`<div class="room-dates">From ${fmtDate(r.from)}</div>`:'');
-  const ownerHint = tempGuest?`<div class="room-owner-hint">owner: ${r.owner}</div>`:'';
-
-  card.innerHTML = `
-    ${timerHtml}
-    <div class="room-number">${r.label}</div>
-    <div class="room-type-label">${r.fixedType}</div>
-    <div class="room-name">${nameDisplay}</div>
-    ${ownerHint}${datesHtml}
-    <div class="status-dot"></div>
-  `;
-  return card;
-}
-
-function renderAll() {
-  ['f1','f2'].forEach(f => {
-    const g = document.getElementById(`grid-${f}`);
-    g.innerHTML = '';
-    rooms.filter(r=>r.floor===(f==='f1'?1:2)).forEach(r=>g.appendChild(renderRoom(r)));
-  });
-  renderStats();
-}
-
-function renderStats() {
-  [1,2].forEach(f => {
-    const fr = rooms.filter(r=>r.floor===f);
-    const avail  = fr.filter(r=>r.type==='green'&&!r.fixedColor).length;
-    const occ    = fr.filter(r=>r.type==='red').length;
-    const dclean = fr.filter(r=>r.type==='orange').length;
-    const lclean = fr.filter(r=>r.type==='violet').length;
-    let html = `
-      <div class="stat-pill" style="background:var(--green-bg);border-color:var(--green);color:var(--green)">${avail} free</div>
-      <div class="stat-pill" style="background:var(--red-bg);border-color:var(--red);color:var(--red)">${occ} occupied</div>
-    `;
-    if (dclean) html+=`<div class="stat-pill" style="background:var(--orange-bg);border-color:var(--orange);color:var(--orange)">${dclean} deep clean</div>`;
-    if (lclean) html+=`<div class="stat-pill" style="background:var(--violet-bg);border-color:var(--violet);color:var(--violet)">${lclean} light clean</div>`;
-    document.getElementById(`stats-f${f}`).innerHTML = html;
-  });
-}
-
-// ── CLEANING ───────────────────────────────────────────
-function buildChecklist(containerId, items, typeClass) {
-  cleaningState = {};
-  const container = document.getElementById(containerId);
-  container.innerHTML = '';
-  items.forEach((label, i) => {
-    cleaningState[i] = false;
-    const row = document.createElement('div');
-    row.className = 'clean-item';
-    row.innerHTML = `<div class="clean-cb" id="cb-${typeClass}-${i}"></div><div class="clean-label" id="cl-${typeClass}-${i}">${label}</div>`;
-    row.onclick = () => {
-      cleaningState[i] = !cleaningState[i];
-      const cb = document.getElementById(`cb-${typeClass}-${i}`);
-      const cl = document.getElementById(`cl-${typeClass}-${i}`);
-      cb.classList.toggle('checked', cleaningState[i]);
-      cb.classList.toggle(typeClass, cleaningState[i]);
-      cb.textContent = cleaningState[i] ? '✓' : '';
-      cl.classList.toggle('done', cleaningState[i]);
-    };
-    container.appendChild(row);
-  });
-}
-
-window.markCleaningDone = function(type) {
-  if (!currentRoom) return;
-  const r = rooms.find(x=>x.id===currentRoom.id);
-  r.type = 'green'; r.greenSince = Date.now();
-  r.occupant = ''; r.from = ''; r.to = '';
-  saveRoom_db(r); renderAll(); closeModal();
-  showToast(`Room ${r.label} cleaned & available ✓`);
-};
-
-// ── MODAL ──────────────────────────────────────────────
-window.openModal = function(id) {
-  const r = rooms.find(x=>x.id===id);
-  if (!r) return;
-  currentRoom = JSON.parse(JSON.stringify(r));
-
-  document.getElementById('m-badge').style.background = C.bg[r.type]||'#eee';
-  document.getElementById('m-badge').style.color = C.txt[r.type]||'#666';
-  document.getElementById('m-badge').textContent = r.label;
-  document.getElementById('m-title').textContent = `Room ${r.label}`;
-  document.getElementById('m-subtitle').textContent = r.fixedType+(r.emergency?' — small room (sleeping only)':'');
-
-  const showStatus = isNormalRoom(r)&&(r.type==='green'||r.type==='red');
-  document.getElementById('status-group').style.display = showStatus?'':'none';
-  if (showStatus) updateStatusButtons(r.type);
-
-  const showDeep  = r.type==='orange';
-  const showLight = r.type==='violet';
-  document.getElementById('clean-deep').style.display  = showDeep ?'':'none';
-  document.getElementById('clean-light').style.display = showLight?'':'none';
-  if (showDeep)  buildChecklist('deep-items',  DEEP_CLEAN_ITEMS,  'deep');
-  if (showLight) buildChecklist('light-items', LIGHT_CLEAN_ITEMS, 'light');
-
-  const showRestore = isPriestRoom(r)&&r.owner;
-  document.getElementById('restore-group').style.display = showRestore?'':'none';
-  if (showRestore) document.getElementById('restore-owner-name').textContent = r.owner;
-
-  document.getElementById('guest-group').style.display = r.canEdit.includes('guest')?'':'none';
-  document.getElementById('m-guest').value = r.occupant||'';
-
-  document.getElementById('dates-section').style.display = r.canEdit.includes('dates')?'':'none';
-  document.getElementById('m-from').value = r.from||'';
-  document.getElementById('m-to').value   = r.to||'';
-
-  document.getElementById('m-notes').value = r.notes||'';
-
-  const infoEl = document.getElementById('m-info');
-  let info = '';
-  if (r.type==='orange')       info='🧹 Deep clean required before the room can be made available again.';
-  else if (r.type==='violet')  info='🪣 Light clean required (dusting only). Room has been free for 2 weeks.';
-  else if (r.type==='green'&&r.greenSince&&!r.fixedColor) { const dl=daysLeft(r); info=`⏱ ${dl} day${dl!==1?'s':''} until light cleaning is required.`; }
-  else if (r.fixedType==='Seminarian'||r.fixedType==='Student') info='Annual fixed room. Only the occupant name can be updated here.';
-  else if (r.fixedType==='Emergency') info='🛏 Emergency room — sleeping only, no wardrobe.';
-  infoEl.style.display = info?'':'none';
-  infoEl.textContent = info;
-
-  document.getElementById('modal-overlay').classList.add('open');
-  setTimeout(()=>{ document.querySelector('.modal-body').scrollTop=0; }, 10);
-};
-
-function updateStatusButtons(type) {
-  ['green','red'].forEach(s=>document.getElementById(`btn-${s}`).classList.toggle('active',type===s));
-}
-
-window.setStatus = function(s) {
-  if (!currentRoom) return;
-  currentRoom.type = s;
-  if (s==='green') {
-    currentRoom.greenSince=Date.now(); currentRoom.occupant=''; currentRoom.from=''; currentRoom.to='';
-    document.getElementById('m-guest').value='';
-    document.getElementById('m-from').value='';
-    document.getElementById('m-to').value='';
-  } else if (s==='red') {
-    currentRoom.greenSince=null;
+// ── RENDER ────────────────────────────────────────────────
+function renderCell(cellDef){
+  if(cellDef.kind==='stair') return null; // handled separately
+  if(cellDef.kind==='label'){
+    const el=document.createElement('div');
+    el.className='label-cell';
+    el.innerHTML=`<span>${cellDef.label||'?'}</span>`;
+    return el;
   }
-  updateStatusButtons(s);
-  document.getElementById('m-badge').style.background = C.bg[s]||'#eee';
-  document.getElementById('m-badge').style.color = C.txt[s]||'#666';
+  if(cellDef.kind==='excluded'){
+    const el=document.createElement('div');
+    el.className='room-cell excluded';
+    return el;
+  }
+  if(cellDef.kind==='gap'){
+    const el=document.createElement('div');
+    el.className='gap';
+    return el;
+  }
+  // room
+  const r = rooms[cellDef.id];
+  if(!r) return null;
+
+  const el=document.createElement('div');
+  const t = r.type==='red-occupied'?'red':r.type;
+  el.className=`room-cell ${t}${r.carpet?' has-carpet':''}${!r.configured?' unconfigured':''}`;
+  el.onclick=()=>openModal(r.id);
+
+  const dl=daysLeft(r);
+  const timer=(dl!==null&&dl<=7)?`<div class="timer-badge">${dl}d</div>`:'';
+  const nameDisp = r.name||(r.type==='green'?'Free':r.type==='unconfigured'?'Tap to setup':'');
+  const datesDisp = (r.from&&r.to)?`${fmtDate(r.from)}→${fmtDate(r.to)}`:'';
+  const typeLabel = r.roomType ? r.roomType.charAt(0).toUpperCase()+r.roomType.slice(1) : '—';
+
+  el.innerHTML=`
+    ${timer}
+    <div class="cell-label">${typeLabel}</div>
+    <div class="cell-name">${nameDisp}</div>
+    ${datesDisp?`<div class="cell-dates">${datesDisp}</div>`:''}
+  `;
+  return el;
+}
+
+function renderFloor(layout, planEl){
+  planEl.innerHTML='';
+
+  // Find stair cell defs to handle tall ones
+  const tallStairs = new Set();
+  layout.forEach(rowDef => {
+    rowDef.cells.forEach(c=>{ if(c.kind==='stair'&&c.rows===2) tallStairs.add(c.id); });
+  });
+
+  layout.forEach((rowDef,ri)=>{
+    const rowEl=document.createElement('div');
+    rowEl.className='plan-row';
+
+    rowDef.cells.forEach(c=>{
+      if(c.kind==='stair'){
+        if(c.rows===2){
+          if(ri===0){
+            // render tall stair
+            const s=document.createElement('div');
+            s.className='staircase tall';
+            s.innerHTML=`<div class="stair-label">STAIRS</div>`;
+            rowEl.appendChild(s);
+          }
+          // skip on row 1 (already rendered)
+        } else {
+          const s=document.createElement('div');
+          s.className='staircase normal';
+          s.innerHTML=`<div class="stair-label">STAIRS</div>`;
+          rowEl.appendChild(s);
+        }
+        return;
+      }
+      const el=renderCell(c);
+      if(el) rowEl.appendChild(el);
+    });
+
+    planEl.appendChild(rowEl);
+  });
+}
+
+function renderStats(floorId){
+  const floorRooms = Object.values(rooms).filter(r=>r.floor===floorId);
+  const avail  = floorRooms.filter(r=>r.type==='green').length;
+  const occ    = floorRooms.filter(r=>r.type==='red'||r.type==='red-occupied').length;
+  const clean1 = floorRooms.filter(r=>r.type==='orange').length;
+  const clean2 = floorRooms.filter(r=>r.type==='violet').length;
+  let html=`<div class="stat-pill" style="background:var(--green-bg);border-color:var(--green);color:var(--green)">${avail} available</div>`;
+  if(occ)    html+=`<div class="stat-pill" style="background:var(--red-bg);border-color:var(--red);color:var(--red)">${occ} occupied</div>`;
+  if(clean1) html+=`<div class="stat-pill" style="background:var(--orange-bg);border-color:var(--orange);color:var(--orange)">${clean1} deep clean</div>`;
+  if(clean2) html+=`<div class="stat-pill" style="background:var(--violet-bg);border-color:var(--violet);color:var(--violet)">${clean2} refreshing</div>`;
+  const el=document.getElementById('stats-'+floorId);
+  if(el) el.innerHTML=html;
+}
+
+function renderAll(){
+  renderFloor(F1_LAYOUT, document.getElementById('plan-f1'));
+  renderFloor(F2_LAYOUT, document.getElementById('plan-f2'));
+  renderStats('f1');
+  renderStats('f2');
+}
+
+// ── TABS ──────────────────────────────────────────────────
+window.switchTab = function(id){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['f1','f2','sisters'][i]===id));
+  document.querySelectorAll('.floor-page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
 };
 
-window.setFullYear = function() {
-  const from = todayStr();
-  document.getElementById('m-from').value = from;
-  document.getElementById('m-to').value   = oneYearFrom(from);
-};
+// ── MODAL ─────────────────────────────────────────────────
+window.openModal = function(id){
+  const r=rooms[id]; if(!r) return;
+  currentId=id;
+  cleanState={};
 
-window.setFromToday = function() {
-  document.getElementById('m-from').value = todayStr();
-};
+  const body=document.getElementById('modal-body');
+  body.innerHTML='';
 
-window.restoreOwner = function() {
-  if (!currentRoom||!currentRoom.owner) return;
-  const r = rooms.find(x=>x.id===currentRoom.id);
-  r.occupant=r.owner; r.from=''; r.to='';
-  saveRoom_db(r); renderAll();
-  showToast(`↩ Restored to ${r.owner}`);
-  closeModal();
-};
+  const t = r.type==='red-occupied'?'red':r.type;
+  const badge=document.getElementById('m-badge');
+  badge.style.background=BG[r.type]||'#eee';
+  badge.style.color=CLR[r.type]||'#666';
+  badge.textContent=r.name||'?';
+  document.getElementById('m-title').textContent=r.name||'Room';
+  document.getElementById('m-sub').textContent=(r.roomType||'Not configured')+(r.carpet?' · has carpet':'');
 
-window.closeModal = function() {
-  currentRoom=null; cleaningState={};
-  document.getElementById('modal-overlay').classList.remove('open');
-};
-
-window.saveRoom = function() {
-  if (!currentRoom) return;
-  const r = rooms.find(x=>x.id===currentRoom.id);
-  if (!r) return;
-
-  const prevType = r.type;
-  r.type = currentRoom.type;
-  r.greenSince = currentRoom.greenSince;
-
-  if (r.canEdit.includes('guest'))  r.occupant = document.getElementById('m-guest').value.trim();
-  if (r.canEdit.includes('dates')) { r.from=document.getElementById('m-from').value; r.to=document.getElementById('m-to').value; }
-  r.notes = document.getElementById('m-notes').value.trim();
-
-  // Guest left → deep clean required
-  if (prevType==='red' && r.type==='green') {
-    r.type='orange'; r.greenSince=null; r.occupant=''; r.from=''; r.to='';
-    saveRoom_db(r); renderAll(); closeModal();
-    showToast(`Room ${r.label} freed — deep clean required 🧹`);
+  // ── NOT CONFIGURED: show setup form ──
+  if(!r.configured){
+    body.appendChild(section('Room Setup'));
+    body.appendChild(fieldSelect('Room type','m-roomtype',[
+      {v:'normal',l:'Normal (guest room)'},
+      {v:'priest',l:'Priest room (semi-fixed)'},
+      {v:'fixed',l:'Fixed (seminarian/student/resident)'},
+      {v:'emergency',l:'Emergency room'},
+      {v:'itinerancy',l:'Annual itinerancy'},
+    ], r.roomType||'normal'));
+    body.appendChild(fieldText('Name / Occupant','m-name',r.name||''));
+    body.appendChild(toggleRow('Has carpet','m-carpet',r.carpet));
+    body.appendChild(fieldText('Notes','m-notes',r.notes||''));
+    document.getElementById('btn-save').textContent='Save & Configure';
+    document.getElementById('modal-overlay').classList.add('open');
+    setTimeout(()=>{body.scrollTop=0;},10);
     return;
   }
 
-  saveRoom_db(r); renderAll(); closeModal();
-  showToast(`Room ${r.label} updated ✓`);
+  // ── CLEANING states ──
+  if(r.type==='orange'){
+    body.appendChild(buildCleanBox('deep'));
+    body.appendChild(infoNote('🧹 Deep clean required before room can be marked available.'));
+    document.getElementById('btn-save').textContent='Save';
+    document.getElementById('modal-overlay').classList.add('open');
+    setTimeout(()=>{body.scrollTop=0;},10);
+    return;
+  }
+  if(r.type==='violet'){
+    body.appendChild(buildCleanBox('light'));
+    body.appendChild(infoNote('🪣 Light refresh required (2 weeks without guest).'));
+    document.getElementById('btn-save').textContent='Save';
+    document.getElementById('modal-overlay').classList.add('open');
+    setTimeout(()=>{body.scrollTop=0;},10);
+    return;
+  }
+
+  // ── RESTORE OWNER (priest) ──
+  if(isPriestRoom(r) && r.owner && r.name!==r.owner){
+    const rb=document.createElement('div');
+    rb.className='restore-box';
+    rb.innerHTML=`<div class="restore-lbl">Owner: <strong>${r.owner}</strong></div><button class="restore-btn" onclick="restoreOwner()">↩ Restore</button>`;
+    body.appendChild(rb);
+  }
+
+  // ── STATUS (only for normal/emergency rooms) ──
+  if(r.roomType==='normal'||r.roomType==='emergency'){
+    body.appendChild(section('Status'));
+    const sb=document.createElement('div');
+    sb.className='status-btns';
+    sb.innerHTML=`
+      <button class="status-btn s-green ${(t==='green')?'active':''}" onclick="setStatus('green')" id="btn-s-green">✓ Available</button>
+      <button class="status-btn s-red   ${(t==='red'||t==='red-occupied')?'active':''}" onclick="setStatus('red')" id="btn-s-red">● Occupied</button>
+    `;
+    body.appendChild(sb);
+  }
+
+  // ── OCCUPANT & DATES ──
+  body.appendChild(section('Occupant'));
+  body.appendChild(fieldText('Name','m-name',r.name||''));
+
+  body.appendChild(section('Stay period'));
+  const dr=document.createElement('div');
+  dr.className='field-row';
+  dr.appendChild(fieldText('From','m-from',r.from||'','date'));
+  dr.appendChild(fieldText('To','m-to',r.to||'','date'));
+  body.appendChild(dr);
+  const dq=document.createElement('div');
+  dq.className='date-quick';
+  dq.innerHTML=`<button class="quick-btn" onclick="setFullYear()">📅 Full year</button><button class="quick-btn" onclick="setFromToday()">📅 From today</button>`;
+  body.appendChild(dq);
+
+  // ── ROOM SETTINGS ──
+  body.appendChild(section('Room settings'));
+  body.appendChild(toggleRow('Has carpet','m-carpet',r.carpet));
+  body.appendChild(fieldText('Notes','m-notes',r.notes||''));
+
+  // ── CONFIGURE button (reconfigure) ──
+  const recfg=document.createElement('button');
+  recfg.className='btn-danger';
+  recfg.textContent='⚙ Reconfigure room type';
+  recfg.style.marginTop='4px';
+  recfg.onclick=()=>{ rooms[currentId].configured=false; openModal(currentId); };
+  body.appendChild(recfg);
+
+  // INFO
+  if(r.type==='green'&&r.greenSince){
+    const dl=daysLeft(r);
+    if(dl!==null) body.appendChild(infoNote(`⏱ ${dl} day${dl!==1?'s':''} until refresh needed.`));
+  }
+
+  document.getElementById('btn-save').textContent='Save';
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(()=>{body.scrollTop=0;},10);
 };
 
-// ── TOAST ──────────────────────────────────────────────
-function showToast(msg) {
+// helper builders
+function section(label){
+  const d=document.createElement('div');
+  d.className='section-sep';
+  d.textContent=label;
+  return d;
+}
+
+function fieldText(label,id,value,type='text'){
+  const g=document.createElement('div');
+  g.className='field-group';
+  g.innerHTML=`<div class="field-label">${label}</div><input class="field-input" id="${id}" type="${type}" value="${value}" autocomplete="off">`;
+  return g;
+}
+
+function fieldSelect(label,id,options,selected){
+  const g=document.createElement('div');
+  g.className='field-group';
+  const opts=options.map(o=>`<option value="${o.v}"${o.v===selected?' selected':''}>${o.l}</option>`).join('');
+  g.innerHTML=`<div class="field-label">${label}</div><select class="field-input" id="${id}">${opts}</select>`;
+  return g;
+}
+
+function toggleRow(label,id,val){
+  const d=document.createElement('div');
+  d.className='toggle-row';
+  d.innerHTML=`<span class="toggle-label">${label}</span><button class="toggle ${val?'on':''}" id="${id}" onclick="this.classList.toggle('on')"></button>`;
+  return d;
+}
+
+function infoNote(txt){
+  const d=document.createElement('div');
+  d.className='info-note';
+  d.textContent=txt;
+  return d;
+}
+
+function buildCleanBox(type){
+  const items=type==='deep'?DEEP_ITEMS:LIGHT_ITEMS;
+  const box=document.createElement('div');
+  box.className=`clean-box ${type}`;
+  const title=type==='deep'?'🧹 Deep Cleaning Required':'🪣 Light Refresh Required';
+  box.innerHTML=`<div class="clean-title">${title}</div>`;
+  items.forEach((lbl,i)=>{
+    cleanState[i]=false;
+    const row=document.createElement('div');
+    row.className='clean-item';
+    row.innerHTML=`<div class="clean-cb" id="cb-${i}"></div><div class="clean-lbl" id="cl-${i}">${lbl}</div>`;
+    row.onclick=()=>{
+      cleanState[i]=!cleanState[i];
+      const cb=document.getElementById(`cb-${i}`);
+      const cl=document.getElementById(`cl-${i}`);
+      cb.classList.toggle('on',cleanState[i]);
+      cb.classList.toggle(type,cleanState[i]);
+      cb.textContent=cleanState[i]?'✓':'';
+      cl.classList.toggle('done',cleanState[i]);
+    };
+    box.appendChild(row);
+  });
+  const btn=document.createElement('button');
+  btn.className='clean-done-btn';
+  btn.textContent='✓ Done — mark as available';
+  btn.onclick=()=>{
+    const r=rooms[currentId];
+    r.type='green'; r.greenSince=Date.now(); r.name=r.owner||''; r.from=''; r.to='';
+    saveRoomDb(r); renderAll(); closeModal();
+    showToast('Room cleaned & available ✓');
+  };
+  box.appendChild(btn);
+  return box;
+}
+
+// ── STATUS TOGGLE ──────────────────────────────────────────
+window.setStatus=function(s){
+  const r=rooms[currentId]; if(!r) return;
+  r.type=s;
+  if(s==='green'){ r.greenSince=Date.now(); }
+  else { r.greenSince=null; }
+  ['green','red'].forEach(x=>{
+    const b=document.getElementById('btn-s-'+x);
+    if(b) b.classList.toggle('active',x===s);
+  });
+};
+
+window.restoreOwner=function(){
+  const r=rooms[currentId]; if(!r||!r.owner) return;
+  r.name=r.owner; r.from=''; r.to='';
+  saveRoomDb(r); renderAll(); showToast(`↩ Restored to ${r.owner}`); closeModal();
+};
+
+window.setFullYear=function(){
+  const from=todayStr();
+  const fi=document.getElementById('m-from'); if(fi) fi.value=from;
+  const ti=document.getElementById('m-to');   if(ti) ti.value=oneYearFrom(from);
+};
+
+window.setFromToday=function(){
+  const fi=document.getElementById('m-from'); if(fi) fi.value=todayStr();
+};
+
+// ── SAVE ──────────────────────────────────────────────────
+window.saveRoom=function(){
+  const r=rooms[currentId]; if(!r) return;
+
+  if(!r.configured){
+    // Configure
+    const rt=document.getElementById('m-roomtype');
+    const nm=document.getElementById('m-name');
+    const cp=document.getElementById('m-carpet');
+    const nt=document.getElementById('m-notes');
+    r.roomType = rt?rt.value:'normal';
+    r.name     = nm?nm.value.trim():'';
+    r.owner    = (r.roomType==='priest'&&r.name)?r.name:null;
+    r.carpet   = cp?cp.classList.contains('on'):false;
+    r.notes    = nt?nt.value.trim():'';
+    r.type     = TYPE_COLOR[r.roomType]||'green';
+    r.configured=true;
+    if(r.type==='green') r.greenSince=Date.now();
+    saveRoomDb(r); renderAll(); closeModal();
+    showToast('Room configured ✓');
+    return;
+  }
+
+  const nm=document.getElementById('m-name');
+  const mf=document.getElementById('m-from');
+  const mt=document.getElementById('m-to');
+  const cp=document.getElementById('m-carpet');
+  const nt=document.getElementById('m-notes');
+
+  const prevType=r.type;
+
+  if(nm) r.name=nm.value.trim();
+  if(mf) r.from=mf.value;
+  if(mt) r.to=mt.value;
+  if(cp) r.carpet=cp.classList.contains('on');
+  if(nt) r.notes=nt.value.trim();
+
+  // If switching from occupied to available → deep clean
+  if(prevType==='red'&&r.type==='green'){
+    r.type='orange'; r.greenSince=null; r.name=r.owner||''; r.from=''; r.to='';
+    saveRoomDb(r); renderAll(); closeModal();
+    showToast('Room freed — deep clean required 🧹');
+    return;
+  }
+
+  // If setting as occupied with dates, mark as red-occupied for auto-transition
+  if(r.type==='red'&&r.to){
+    r.type='red-occupied';
+  }
+
+  saveRoomDb(r); renderAll(); closeModal();
+  showToast('Saved ✓');
+};
+
+window.closeModal=function(){
+  currentId=null; cleanState={};
+  document.getElementById('modal-overlay').classList.remove('open');
+};
+
+// ── TOAST ─────────────────────────────────────────────────
+function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-// ── INIT ───────────────────────────────────────────────
-document.getElementById('date-display').textContent =
+// ── INIT ──────────────────────────────────────────────────
+document.getElementById('date-pill').textContent =
   new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
 
-document.getElementById('modal-overlay').addEventListener('click', function(e) {
-  if (e.target===this) closeModal();
+document.getElementById('modal-overlay').addEventListener('click',function(e){
+  if(e.target===this) closeModal();
 });
 
-setSyncStatus('syncing');
-setInterval(()=>{ checkTimers(true); renderAll(); }, 60*60*1000);
+setSyncStatus('saving');
+setInterval(()=>{ checkTimers(); renderAll(); }, 30*60*1000);
 </script>
+
 </body>
 </html>
