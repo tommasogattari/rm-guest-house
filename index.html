@@ -7,305 +7,258 @@
 <title>RM Guest House</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#F5F2EC; --surface:#FFFFFF; --surface2:#EAE6DC;
-  --text:#1C1A16; --text2:#6B6760; --text3:#B0AAA0;
-  --border:#DDD8CE;
-  --green:#2E7D4F;    --green-l:#E8F5EE;  --green-m:#C8E6D4;
-  --red:#B03030;      --red-l:#FBF0F0;    --red-m:#F5CECE;
-  --violet:#5E3D96;   --violet-l:#F0EBFB; --violet-m:#D8C8F5;
-  --brown:#7A5830;    --brown-l:#F5EEE3;  --brown-m:#E5D0B0;
-  --pink:#B84870;     --pink-l:#FBF0F5;   --pink-m:#F2C8D8;
-  --blue:#2860A0;     --blue-l:#EBF3FB;   --blue-m:#C0D8F0;
-  --orange:#C06010;   --orange-l:#FDF3E8; --orange-m:#F5D5A8;
-  --CELL:90px; --GAP:8px;
+  --bg:#F2EFE9;--surface:#FFFFFF;--surface2:#E8E4DA;
+  --text:#1A1814;--text2:#6A6560;--text3:#AAA59F;--border:#D5D0C6;
+  --green:#27743F;--green-bg:#C8E6D4;--green-lt:#EDF7F1;
+  --red:#A82828;  --red-bg:#F5CECE;  --red-lt:#FBF0F0;
+  --violet:#5A3490;--violet-bg:#DDD0F5;--violet-lt:#F0EBFB;
+  --orange:#B85810;--orange-bg:#F5DEC0;--orange-lt:#FDF3E8;
+  --pink:#B04068; --pink-bg:#F5D0E0; --pink-lt:#FBF0F5;
+  --brown:#7A5428;--brown-bg:#E8D4B0;--brown-lt:#F5EEE3;
+  --blue:#245C9A; --blue-bg:#C8DCEF; --blue-lt:#EBF3FB;
+  --gray:#555050; --gray-bg:#DDDAD5; --gray-lt:#F0EEEB;
+  --cell:92px;--gap:8px;
 }
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:60px}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:50px}
 
-/* ── LOADING ── */
-#loading{position:fixed;inset:0;background:var(–bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:999}
-#loading .logo{font-family:‘DM Serif Display’,serif;font-size:26px}
-#loading .logo em{color:var(–brown);font-style:normal}
+/* LOADING */
+#loading{position:fixed;inset:0;background:var(–bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:9999}
+#loading h1{font-family:‘DM Serif Display’,serif;font-size:26px}
+#loading h1 span{color:var(–brown)}
 .spinner{width:28px;height:28px;border:3px solid var(–border);border-top-color:var(–brown);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── HEADER ── */
-header{
-background:var(–surface);border-bottom:1px solid var(–border);
-padding:0 18px;display:flex;align-items:center;justify-content:space-between;
-height:58px;position:sticky;top:0;z-index:200;
-box-shadow:0 1px 8px rgba(0,0,0,.06);
-}
-.h-logo{font-family:‘DM Serif Display’,serif;font-size:19px;letter-spacing:-.2px}
-.h-logo em{color:var(–brown);font-style:normal}
+/* HEADER */
+header{position:sticky;top:0;z-index:500;background:#FFFFFF;border-bottom:1px solid var(–border);padding:0 18px;height:56px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.h-logo{font-family:‘DM Serif Display’,serif;font-size:18px}
+.h-logo span{color:var(–brown)}
 .h-right{display:flex;align-items:center;gap:10px}
-.sync{width:8px;height:8px;border-radius:50%;background:var(–text3);transition:background .3s}
-.sync.ok{background:var(–green)}.sync.saving{background:var(–orange);animation:blink .8s infinite}.sync.err{background:var(–red)}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(–text3);transition:background .3s}
+.sync-dot.ok{background:var(–green)}.sync-dot.saving{background:var(–orange);animation:blink .8s infinite}.sync-dot.err{background:var(–red)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.datepill{font-size:11px;color:var(–text2);background:var(–surface2);padding:5px 12px;border-radius:20px;border:1px solid var(–border)}
+.date-chip{font-size:11px;color:var(–text2);background:var(–surface2);padding:5px 12px;border-radius:20px;border:1px solid var(–border)}
 
-/* ── TABS ── */
-.tabs{display:flex;background:var(–surface);border-bottom:2px solid var(–border);position:sticky;top:58px;z-index:199}
-.tab{flex:1;font-family:‘DM Sans’,sans-serif;font-size:13px;font-weight:600;padding:13px 4px;border:none;background:transparent;color:var(–text3);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s}
-.tab.on{color:var(–brown);border-bottom-color:var(–brown)}
+/* TABS */
+.tabs{position:sticky;top:56px;z-index:499;background:#FFFFFF;border-bottom:1px solid var(–border);display:flex}
+.tab-btn{flex:1;border:none;cursor:pointer;font-family:‘DM Sans’,sans-serif;font-size:13px;font-weight:600;height:48px;padding:0;color:var(–text3);background:#FFFFFF;border-bottom:3px solid transparent;transition:color .15s,background .15s,border-color .15s}
+.tab-btn.active{color:#FFFFFF;background:var(–brown);border-bottom-color:var(–brown)}
 
-/* ── PAGE ── */
-.page{display:none;padding:20px 16px}
-.page.on{display:block}
+/* PAGES */
+.page{display:none;padding:18px 14px}
+.page.active{display:block}
 
-/* ── STATS ── */
-.statsbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
-.sp{font-size:10px;font-weight:700;padding:4px 11px;border-radius:20px;border:1.5px solid;letter-spacing:.2px}
+/* STATS */
+.statsbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.stat-chip{font-size:10px;font-weight:700;letter-spacing:.3px;padding:4px 12px;border-radius:20px;border:1.5px solid}
 
-/* ── LEGEND ── */
-.legend{display:flex;flex-wrap:wrap;gap:5px 14px;margin-bottom:20px}
-.li{display:flex;align-items:center;gap:5px;font-size:10px;color:var(–text2)}
-.ld{width:12px;height:12px;border-radius:3px;flex-shrink:0;border:1.5px solid}
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:18px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(–text2)}
+.leg-dot{width:13px;height:13px;border-radius:4px;border:2px solid;flex-shrink:0}
 
-/* ── PLAN ── */
-.plan-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
-.plan{display:inline-grid;gap:var(–GAP)}
-/* grid set per-floor in JS */
+/* PLAN */
+.plan-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.plan-grid{display:inline-grid;gap:var(–gap);padding-bottom:6px}
 
-/* ── CELL BASE ── */
-.cell{
-width:var(–CELL);height:var(–CELL);
-border-radius:10px;border:2.5px solid;
-position:relative;cursor:pointer;
-display:flex;flex-direction:column;justify-content:flex-end;
-padding:6px 7px 7px;
-transition:transform .1s,box-shadow .1s;
--webkit-user-select:none;user-select:none;
-overflow:hidden;
-}
-.cell:active{transform:scale(.94);box-shadow:inset 0 0 0 2px rgba(0,0,0,.08)}
-
-/* colors */
-.c-green  {background:var(–green-l); border-color:var(–green)}
-.c-red    {background:var(–red-l);   border-color:var(–red)}
-.c-violet {background:var(–violet-l);border-color:var(–violet)}
-.c-brown  {background:var(–brown-l); border-color:var(–brown)}
-.c-pink   {background:var(–pink-l);  border-color:var(–pink)}
-.c-blue   {background:var(–blue-l);  border-color:var(–blue)}
-.c-orange {background:var(–orange-l);border-color:var(–orange)}
-
-/* unconfigured */
-.c-empty{background:var(–surface);border:2px dashed var(–border);cursor:pointer}
-.c-empty .ct{color:var(–text3);font-size:9px;font-style:italic}
-
-/* excluded (X) */
-.c-x{background:var(–bg);border:2px dashed #CCC;cursor:default}
-.c-x::before,.c-x::after{content:’’;position:absolute;background:#CCC;width:130%;height:2px;top:50%;left:-15%}
-.c-x::before{transform:rotate(30deg)}.c-x::after{transform:rotate(-30deg)}
-
-/* staircase */
-.stair{
-border-radius:10px;border:2px solid var(–border);
-background:var(–surface2);
-display:flex;align-items:center;justify-content:center;
-width:var(–CELL);flex-shrink:0;
-}
-.stair-lbl{font-size:9px;font-weight:700;letter-spacing:2.5px;color:var(–text3);writing-mode:vertical-rl}
-
-/* label block (ART ROOM, WC) */
-.lblock{
-border-radius:10px;border:2px solid var(–border);
-background:var(–surface2);
-display:flex;align-items:center;justify-content:center;
-width:var(–CELL);height:var(–CELL);flex-shrink:0;
-text-align:center;padding:6px;
-}
-.lblock span{font-size:10px;font-weight:700;color:var(–text2);line-height:1.3;letter-spacing:.3px}
-
-/* carpet stripe */
-.cell.carpet::before{
-content:’’;position:absolute;bottom:0;left:0;right:0;height:4px;opacity:.45;border-radius:0 0 8px 8px;
-}
-.c-green.carpet::before  {background:var(–green)}
-.c-red.carpet::before    {background:var(–red)}
-.c-violet.carpet::before {background:var(–violet)}
-.c-brown.carpet::before  {background:var(–brown)}
-.c-pink.carpet::before   {background:var(–pink)}
-.c-blue.carpet::before   {background:var(–blue)}
-.c-orange.carpet::before {background:var(–orange)}
-
+/* ROOM CELL */
+.room-cell{width:var(–cell);height:var(–cell);border-radius:10px;border:2.5px solid;cursor:pointer;position:relative;display:flex;flex-direction:column;justify-content:flex-end;padding:6px 7px 8px;overflow:hidden;transition:transform .1s;-webkit-user-select:none;user-select:none}
+.room-cell:active{transform:scale(.93)}
+.room-cell.green  {background:var(–green-lt); border-color:var(–green)}
+.room-cell.red    {background:var(–red-lt);   border-color:var(–red)}
+.room-cell.violet {background:var(–violet-lt);border-color:var(–violet)}
+.room-cell.orange {background:var(–orange-lt);border-color:var(–orange)}
+.room-cell.pink   {background:var(–pink-lt);  border-color:var(–pink)}
+.room-cell.brown  {background:var(–brown-lt); border-color:var(–brown)}
+.room-cell.blue   {background:var(–blue-lt);  border-color:var(–blue)}
+.room-cell.gray   {background:var(–gray-lt);  border-color:var(–gray)}
+.room-cell.empty  {background:#E8E4DA;border:2.5px dashed #B0A898}
+.room-cell.excluded{background:var(–bg);border:2px dashed #CCC;cursor:default}
+.room-cell.excluded::before,.room-cell.excluded::after{content:’’;position:absolute;background:#CCC;width:130%;height:2px;top:50%;left:-15%}
+.room-cell.excluded::before{transform:rotate(30deg)}.room-cell.excluded::after{transform:rotate(-30deg)}
+/* carpet stripe at bottom */
+.room-cell.carpet::after{content:’’;position:absolute;bottom:0;left:0;right:0;height:5px;border-radius:0 0 8px 8px;opacity:.5}
+.room-cell.green.carpet::after  {background:var(–green)}
+.room-cell.red.carpet::after    {background:var(–red)}
+.room-cell.violet.carpet::after {background:var(–violet)}
+.room-cell.orange.carpet::after {background:var(–orange)}
+.room-cell.pink.carpet::after   {background:var(–pink)}
+.room-cell.brown.carpet::after  {background:var(–brown)}
+.room-cell.blue.carpet::after   {background:var(–blue)}
+.room-cell.gray.carpet::after   {background:var(–gray)}
+.room-cell.empty.carpet::after  {background:#B0A898}
 /* cell text */
-.ct{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;opacity:.65;line-height:1;margin-bottom:2px}
-.cn{font-size:11px;font-weight:600;color:var(–text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25}
-.cd{font-size:9px;color:var(–text3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell-type{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;opacity:.7;line-height:1;margin-bottom:2px}
+.cell-name{font-size:11px;font-weight:600;color:var(–text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+.cell-dates{font-size:9px;color:var(–text3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell-hint{font-size:9px;color:var(–text3);font-style:italic;line-height:1.3}
+.room-cell.green .cell-type  {color:var(–green)}
+.room-cell.red .cell-type    {color:var(–red)}
+.room-cell.violet .cell-type {color:var(–violet)}
+.room-cell.orange .cell-type {color:var(–orange)}
+.room-cell.pink .cell-type   {color:var(–pink)}
+.room-cell.brown .cell-type  {color:var(–brown)}
+.room-cell.blue .cell-type   {color:var(–blue)}
+.room-cell.gray .cell-type   {color:var(–gray)}
+.timer-badge{position:absolute;top:5px;right:5px;font-size:8px;font-weight:700;background:#FFFFFF;color:var(–violet);border:1px solid var(–violet);padding:2px 4px;border-radius:4px}
 
-.c-green  .ct{color:var(–green)}
-.c-red    .ct{color:var(–red)}
-.c-violet .ct{color:var(–violet)}
-.c-brown  .ct{color:var(–brown)}
-.c-pink   .ct{color:var(–pink)}
-.c-blue   .ct{color:var(–blue)}
-.c-orange .ct{color:var(–orange)}
+/* STAIR / LABEL */
+.stair-cell{width:var(–cell);border-radius:10px;border:2px solid var(–border);background:var(–surface2);display:flex;align-items:center;justify-content:center}
+.stair-label{font-size:9px;font-weight:700;letter-spacing:3px;color:var(–text3);writing-mode:vertical-rl}
+.label-cell{width:var(–cell);height:var(–cell);border-radius:10px;border:2px solid var(–border);background:var(–surface2);display:flex;align-items:center;justify-content:center;text-align:center;padding:6px}
+.label-cell span{font-size:10px;font-weight:700;color:var(–text2);line-height:1.4;letter-spacing:.3px}
 
-/* timer badge */
-.tbadge{position:absolute;top:6px;right:6px;font-size:8px;font-weight:700;background:rgba(255,255,255,.9);color:var(–violet);border:1px solid var(–violet);padding:2px 4px;border-radius:4px}
-
-/* ── MODAL ── */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:300;align-items:flex-end;justify-content:center}
-.overlay.on{display:flex}
-.sheet{
-background:var(–surface);width:100%;max-width:540px;
+/* ===================== MODAL ===================== */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-sheet{
+background:#FFFFFF;
+width:100%;max-width:520px;
 border-radius:22px 22px 0 0;
-box-shadow:0 -6px 40px rgba(0,0,0,.16);
-max-height:92vh;display:flex;flex-direction:column;
-animation:up .22s cubic-bezier(.32,1.1,.6,1);
+max-height:90vh;
+display:flex;flex-direction:column;
+box-shadow:0 -4px 32px rgba(0,0,0,.22);
+animation:slideUp .22s cubic-bezier(.3,1,.5,1);
 }
-@media(min-width:560px){.overlay{align-items:center}.sheet{border-radius:22px;max-height:88vh}}
-@keyframes up{from{transform:translateY(50px);opacity:0}to{transform:translateY(0);opacity:1}}
-.handle{width:34px;height:4px;background:var(–border);border-radius:2px;margin:11px auto 0;flex-shrink:0}
-@media(min-width:560px){.handle{display:none}}
+@media(min-width:540px){.modal-overlay{align-items:center}.modal-sheet{border-radius:22px;max-height:86vh}}
+@keyframes slideUp{from{transform:translateY(50px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:36px;height:4px;background:var(–border);border-radius:2px;margin:12px auto 0;flex-shrink:0}
+@media(min-width:540px){.modal-handle{display:none}}
+.modal-header{padding:16px 20px 14px;border-bottom:1px solid var(–border);display:flex;align-items:center;gap:14px;flex-shrink:0;background:#FFFFFF;border-radius:22px 22px 0 0}
+.modal-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:2px solid}
+.modal-title{font-family:‘DM Serif Display’,serif;font-size:19px;color:var(–text)}
+.modal-sub{font-size:12px;color:var(–text2);margin-top:3px}
+.modal-body{padding:18px 20px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;-webkit-overflow-scrolling:touch}
+.modal-footer{padding:12px 20px;padding-bottom:max(12px,env(safe-area-inset-bottom));border-top:1px solid var(–border);display:flex;gap:10px;flex-shrink:0;background:#FFFFFF}
 
-.mhdr{padding:14px 20px 13px;border-bottom:1px solid var(–border);display:flex;align-items:center;gap:13px;flex-shrink:0}
-.mbadge{width:44px;height:44px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:‘DM Serif Display’,serif;font-size:18px;border:2px solid}
-.mtitle{font-family:‘DM Serif Display’,serif;font-size:18px;line-height:1.2}
-.msub{font-size:11px;color:var(–text2);margin-top:3px}
+/* FORM */
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-label{font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(–text2)}
+.form-input{background:var(–bg);border:1.5px solid var(–border);border-radius:10px;padding:12px 14px;font-family:‘DM Sans’,sans-serif;font-size:15px;color:var(–text);outline:none;width:100%;-webkit-appearance:none;appearance:none;transition:border-color .15s}
+.form-input:focus{border-color:var(–brown);background:#FFFFFF}
+select.form-input{cursor:pointer}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.date-shortcuts{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.shortcut-btn{font-family:‘DM Sans’,sans-serif;font-size:11px;font-weight:600;padding:7px 13px;border-radius:8px;border:1.5px solid var(–border);background:var(–surface2);color:var(–text2);cursor:pointer}
+.shortcut-btn:active{background:var(–border)}
+.form-section{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(–text3);padding-bottom:6px;border-bottom:1.5px solid var(–border)}
 
-.mbody{padding:18px 20px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px;-webkit-overflow-scrolling:touch}
-.mfoot{padding:13px 20px;padding-bottom:max(13px,env(safe-area-inset-bottom));border-top:1px solid var(–border);display:flex;gap:10px;flex-shrink:0;background:var(–surface)}
+/* CARPET TOGGLE */
+.carpet-row{display:flex;align-items:center;justify-content:space-between;background:var(–surface2);border-radius:12px;padding:14px 16px;border:1.5px solid var(–border)}
+.carpet-label{font-size:15px;font-weight:500;color:var(–text)}
+.carpet-label small{display:block;font-size:11px;color:var(–text2);margin-top:2px;font-weight:400}
+.toggle-sw{width:52px;height:30px;border-radius:15px;background:var(–border);position:relative;cursor:pointer;border:none;outline:none;flex-shrink:0;transition:background .22s;-webkit-appearance:none;appearance:none}
+.toggle-sw.on{background:var(–green)}
+.toggle-sw::after{content:’’;position:absolute;width:24px;height:24px;border-radius:50%;background:#FFFFFF;top:3px;left:3px;transition:transform .22s;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.toggle-sw.on::after{transform:translateX(22px)}
 
-/* form elements */
-.fg{display:flex;flex-direction:column;gap:6px}
-.fl{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(–text2)}
-.fi{background:var(–bg);border:1.5px solid var(–border);border-radius:10px;padding:11px 13px;font-family:‘DM Sans’,sans-serif;font-size:15px;color:var(–text);outline:none;width:100%;-webkit-appearance:none;transition:border-color .15s}
-.fi:focus{border-color:var(–brown)}
-select.fi{cursor:pointer}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.dq{display:flex;gap:8px;margin-top:5px;flex-wrap:wrap}
-.qb{font-family:‘DM Sans’,sans-serif;font-size:11px;font-weight:600;padding:7px 13px;border-radius:9px;border:1.5px solid var(–border);background:var(–surface2);color:var(–text2);cursor:pointer}
-.qb:active{background:var(–border)}
+/* STATUS BUTTONS */
+.status-row{display:flex;gap:8px}
+.status-btn{flex:1;font-family:‘DM Sans’,sans-serif;font-size:13px;font-weight:600;padding:12px 10px;border-radius:10px;text-align:center;border:2px solid var(–border);background:#FFFFFF;color:var(–text2);cursor:pointer;transition:all .15s}
+.status-btn.active-green{background:var(–green-bg);color:var(–green);border-color:var(–green)}
+.status-btn.active-red  {background:var(–red-bg);  color:var(–red);  border-color:var(–red)}
 
-/* section label */
-.sep{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(–text3);padding-bottom:6px;border-bottom:1px solid var(–border)}
+/* RESTORE */
+.restore-box{background:var(–pink-lt);border:1.5px solid var(–pink);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.restore-lbl{font-size:13px;color:var(–pink)}
+.restore-lbl strong{font-weight:700}
+.restore-btn{font-family:‘DM Sans’,sans-serif;font-size:12px;font-weight:700;padding:8px 14px;border-radius:9px;border:none;background:var(–pink);color:#FFFFFF;cursor:pointer;white-space:nowrap}
 
-/* toggle */
-.trow{display:flex;align-items:center;justify-content:space-between;padding:2px 0}
-.tlbl{font-size:14px;color:var(–text)}
-.tgl{width:44px;height:26px;border-radius:13px;background:var(–border);position:relative;cursor:pointer;border:none;transition:background .2s;flex-shrink:0}
-.tgl.on{background:var(–green)}
-.tgl::after{content:’’;position:absolute;width:20px;height:20px;border-radius:50%;background:white;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.22)}
-.tgl.on::after{transform:translateX(18px)}
+/* CLEANING */
+.clean-box{border-radius:12px;border:2px solid;padding:14px}
+.clean-box.deep-clean {border-color:var(–orange);background:var(–orange-lt)}
+.clean-box.light-clean{border-color:var(–violet);background:var(–violet-lt)}
+.clean-box-title{font-size:13px;font-weight:700;margin-bottom:12px}
+.clean-box.deep-clean  .clean-box-title{color:var(–orange)}
+.clean-box.light-clean .clean-box-title{color:var(–violet)}
+.clean-item{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,.07);cursor:pointer}
+.clean-item:last-of-type{border-bottom:none;padding-bottom:0}
+.clean-cb{width:24px;height:24px;border-radius:7px;border:2px solid;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:#FFFFFF;background:#FFFFFF;transition:all .15s}
+.clean-box.deep-clean  .clean-cb{border-color:var(–orange)}
+.clean-box.light-clean .clean-cb{border-color:var(–violet)}
+.clean-cb.checked{color:#FFFFFF}
+.clean-box.deep-clean  .clean-cb.checked{background:var(–orange);border-color:var(–orange)}
+.clean-box.light-clean .clean-cb.checked{background:var(–violet);border-color:var(–violet)}
+.clean-item-lbl{font-size:14px;color:var(–text)}
+.clean-item-lbl.done{text-decoration:line-through;color:var(–text3)}
+.clean-done-btn{width:100%;margin-top:14px;font-family:‘DM Sans’,sans-serif;font-size:13px;font-weight:700;padding:12px;border-radius:10px;border:none;color:#FFFFFF;cursor:pointer}
+.clean-box.deep-clean  .clean-done-btn{background:var(–orange)}
+.clean-box.light-clean .clean-done-btn{background:var(–violet)}
 
-/* status buttons */
-.sbtns{display:flex;gap:8px}
-.sbtn{font-family:‘DM Sans’,sans-serif;font-size:13px;font-weight:500;padding:11px 14px;border-radius:10px;border:1.5px solid var(–border);cursor:pointer;background:transparent;color:var(–text2);flex:1;text-align:center;transition:all .12s}
-.sbtn.on.sg{background:var(–green-m);color:var(–green);border-color:var(–green);font-weight:700}
-.sbtn.on.sr{background:var(–red-m);  color:var(–red);  border-color:var(–red);  font-weight:700}
+.info-note{font-size:12px;color:var(–text2);background:var(–surface2);border-radius:10px;padding:10px 14px;border:1px solid var(–border);line-height:1.6}
 
-/* restore box */
-.rbox{background:var(–pink-l);border:1.5px solid var(–pink);border-radius:11px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.rlbl{font-size:12px;color:var(–pink)}
-.rlbl strong{font-weight:700}
-.rbtn{font-family:‘DM Sans’,sans-serif;font-size:12px;font-weight:700;padding:8px 14px;border-radius:9px;border:none;background:var(–pink);color:white;cursor:pointer}
+/* BUTTONS */
+.btn-cancel{font-family:‘DM Sans’,sans-serif;font-size:14px;font-weight:500;padding:12px 18px;border-radius:11px;border:1.5px solid var(–border);background:#FFFFFF;color:var(–text2);cursor:pointer}
+.btn-save{flex:1;font-family:‘DM Sans’,sans-serif;font-size:14px;font-weight:700;padding:12px;border-radius:11px;border:none;background:var(–text);color:#FFFFFF;cursor:pointer}
+.btn-save:active{background:#2a2820}
+.btn-reconfig{font-family:‘DM Sans’,sans-serif;font-size:12px;font-weight:600;padding:10px 14px;border-radius:10px;border:1.5px solid var(–border);background:#FFFFFF;color:var(–text2);cursor:pointer;margin-top:4px}
 
-/* cleaning */
-.cbox{border-radius:12px;border:1.5px solid;padding:13px 14px}
-.cbox.deep {border-color:var(–orange);background:var(–orange-l)}
-.cbox.light{border-color:var(–violet);background:var(–violet-l)}
-.ctitle{font-size:12px;font-weight:700;margin-bottom:10px}
-.cbox.deep  .ctitle{color:var(–orange)}
-.cbox.light .ctitle{color:var(–violet)}
-.citem{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);cursor:pointer}
-.citem:last-of-type{border-bottom:none;padding-bottom:0}
-.ccb{width:22px;height:22px;border-radius:6px;border:2px solid;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;color:white;transition:all .15s}
-.cbox.deep  .ccb{border-color:var(–orange)}
-.cbox.light .ccb{border-color:var(–violet)}
-.ccb.on.deep {background:var(–orange);border-color:var(–orange)}
-.ccb.on.light{background:var(–violet);border-color:var(–violet)}
-.clbl{font-size:13px;color:var(–text)}
-.clbl.done{text-decoration:line-through;color:var(–text3)}
-.cdone{width:100%;margin-top:12px;font-family:‘DM Sans’,sans-serif;font-size:13px;font-weight:700;padding:11px;border-radius:10px;border:none;cursor:pointer;color:white}
-.cbox.deep  .cdone{background:var(–orange)}
-.cbox.light .cdone{background:var(–violet)}
-
-.infonote{font-size:11px;color:var(–text3);background:var(–surface2);border-radius:9px;padding:9px 13px;border:1px solid var(–border);line-height:1.55}
-
-/* buttons */
-.bcx{font-family:‘DM Sans’,sans-serif;font-size:14px;font-weight:500;padding:12px 16px;border-radius:11px;border:1.5px solid var(–border);background:transparent;color:var(–text2);cursor:pointer}
-.bsv{font-family:‘DM Sans’,sans-serif;font-size:14px;font-weight:700;padding:12px;border-radius:11px;border:none;background:var(–text);color:white;cursor:pointer;flex:1}
-.bsv:active{background:#2a2820}
-.bdgr{font-family:‘DM Sans’,sans-serif;font-size:12px;font-weight:600;padding:10px 14px;border-radius:10px;border:1.5px solid var(–red);background:transparent;color:var(–red);cursor:pointer;margin-top:4px}
-
-/* toast */
-.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);background:var(–text);color:white;padding:10px 22px;border-radius:24px;font-size:12px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:999;opacity:0;transition:transform .22s,opacity .22s;white-space:nowrap}
-.toast.on{transform:translateX(-50%) translateY(0);opacity:1}
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);background:var(–text);color:#FFFFFF;padding:10px 22px;border-radius:24px;font-size:13px;font-weight:600;box-shadow:0 4px 18px rgba(0,0,0,.22);z-index:9000;opacity:0;transition:transform .22s,opacity .22s;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 </style>
 
 </head>
 <body>
 
-<div id="loading">
-  <div class="logo">RM <em>Guest House</em></div>
-  <div class="spinner"></div>
-</div>
+<div id="loading"><h1>RM <span>Guest House</span></h1><div class="spinner"></div></div>
 
 <header>
-  <div class="h-logo">RM <em>Guest House</em></div>
+  <div class="h-logo">RM <span>Guest House</span></div>
   <div class="h-right">
-    <div class="sync" id="sync"></div>
-    <div class="datepill" id="dpill"></div>
+    <div class="sync-dot" id="sync-dot"></div>
+    <div class="date-chip" id="date-chip"></div>
   </div>
 </header>
 
 <div class="tabs">
-  <button class="tab on"  onclick="goTab('f1')">1st Floor</button>
-  <button class="tab"     onclick="goTab('f2')">2nd Floor</button>
-  <button class="tab"     onclick="goTab('si')">Sisters</button>
+  <button class="tab-btn active" onclick="switchTab('f1')">1st Floor</button>
+  <button class="tab-btn"        onclick="switchTab('f2')">2nd Floor</button>
+  <button class="tab-btn"        onclick="switchTab('si')">Sisters</button>
 </div>
 
-<!-- FIRST FLOOR -->
-
-<div class="page on" id="page-f1">
-  <div class="statsbar" id="sb-f1"></div>
+<div class="page active" id="page-f1">
+  <div class="statsbar" id="stats-f1"></div>
   <div class="legend">
-    <div class="li"><div class="ld" style="background:var(--green-l);border-color:var(--green)"></div>Available</div>
-    <div class="li"><div class="ld" style="background:var(--red-l);border-color:var(--red)"></div>Occupied / Clean</div>
-    <div class="li"><div class="ld" style="background:var(--violet-l);border-color:var(--violet)"></div>Needs refreshing</div>
-    <div class="li"><div class="ld" style="background:var(--pink-l);border-color:var(--pink)"></div>Priest</div>
-    <div class="li"><div class="ld" style="background:var(--blue-l);border-color:var(--blue)"></div>Emergency</div>
-    <div class="li"><div class="ld" style="background:var(--brown-l);border-color:var(--brown)"></div>Fixed</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--green-lt);border-color:var(--green)"></div>Available</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--red-lt);border-color:var(--red)"></div>Occupied</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--orange-lt);border-color:var(--orange)"></div>Deep clean</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--violet-lt);border-color:var(--violet)"></div>Refreshing</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--pink-lt);border-color:var(--pink)"></div>Priest</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--blue-lt);border-color:var(--blue)"></div>Emergency</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--brown-lt);border-color:var(--brown)"></div>Fixed</div>
   </div>
-  <div class="plan-wrap"><div class="plan" id="plan-f1"></div></div>
+  <div class="plan-scroll"><div class="plan-grid" id="grid-f1"></div></div>
 </div>
-
-<!-- SECOND FLOOR -->
 
 <div class="page" id="page-f2">
-  <div class="statsbar" id="sb-f2"></div>
-  <div class="plan-wrap"><div class="plan" id="plan-f2"></div></div>
+  <div class="statsbar" id="stats-f2"></div>
+  <div class="plan-scroll"><div class="plan-grid" id="grid-f2"></div></div>
 </div>
 
-<!-- SISTERS -->
-
 <div class="page" id="page-si">
-  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:70px 20px;gap:14px;text-align:center">
-    <div style="font-size:48px">🏠</div>
-    <div style="font-family:'DM Serif Display',serif;font-size:22px">Sisters Floor</div>
-    <div style="font-size:13px;color:var(--text2);max-width:260px;line-height:1.6">Send the floor plan and we'll add it here!</div>
+  <div style="text-align:center;padding:70px 20px">
+    <div style="font-size:48px;margin-bottom:14px">🏠</div>
+    <div style="font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:10px">Sisters Floor</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.7;max-width:260px;margin:0 auto">Send the floor plan and we'll build this section!</div>
   </div>
 </div>
 
-<!-- MODAL -->
-
-<div class="overlay" id="overlay">
-  <div class="sheet">
-    <div class="handle"></div>
-    <div class="mhdr">
-      <div class="mbadge" id="mbadge"></div>
-      <div style="flex:1;min-width:0">
-        <div class="mtitle" id="mtitle">Room</div>
-        <div class="msub"   id="msub"></div>
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-icon" id="modal-icon"></div>
+      <div>
+        <div class="modal-title" id="modal-title">Room</div>
+        <div class="modal-sub"   id="modal-sub"></div>
       </div>
     </div>
-    <div class="mbody" id="mbody"></div>
-    <div class="mfoot">
-      <button class="bcx" onclick="closeModal()">Cancel</button>
-      <button class="bsv" id="bsv" onclick="saveRoom()">Save</button>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" id="btn-save" onclick="saveRoom()">Save</button>
     </div>
   </div>
 </div>
@@ -316,7 +269,7 @@ select.fi{cursor:pointer}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const FB = {
+const fbApp = initializeApp({
   apiKey:"AIzaSyDkcw4HhYnXotrbuyvD84ONvTJrbbxxAhg",
   authDomain:"rm-guest-room.firebaseapp.com",
   projectId:"rm-guest-room",
@@ -324,432 +277,386 @@ const FB = {
   messagingSenderId:"410582754379",
   appId:"1:410582754379:web:c5937416c15514a18699ce",
   databaseURL:"https://rm-guest-room-default-rtdb.europe-west1.firebasedatabase.app"
-};
-const app = initializeApp(FB);
-const db  = getDatabase(app);
-const ROOT = ref(db,'rmgh_v5');
+});
+const db = getDatabase(fbApp);
+const DB_KEY = 'rmgh_v6';
 
-// ── COLOUR MAP ────────────────────────────────────────────
+const TWO_WEEKS = 14*24*3600*1000;
 const TYPE2COLOR = {normal:'green',priest:'pink',fixed:'brown',emergency:'blue',itinerancy:'blue',resident:'gray'};
-const COLOR_BG   = {green:'var(--green-l)',red:'var(--red-l)',violet:'var(--violet-l)',brown:'var(--brown-l)',pink:'var(--pink-l)',blue:'var(--blue-l)',orange:'var(--orange-l)'};
-const COLOR_MAIN = {green:'var(--green)', red:'var(--red)', violet:'var(--violet)', brown:'var(--brown)', pink:'var(--pink)', blue:'var(--blue)', orange:'var(--orange)'};
-const COLOR_MID  = {green:'var(--green-m)',red:'var(--red-m)',violet:'var(--violet-m)',brown:'var(--brown-m)',pink:'var(--pink-m)',blue:'var(--blue-m)',orange:'var(--orange-m)'};
-const TYPE_LABEL = {normal:'Normal',priest:'Priest',fixed:'Fixed',emergency:'Emergency',itinerancy:'Itinerancy',resident:'Resident'};
+const TYPE_LBL   = {normal:'Normal',priest:'Priest',fixed:'Fixed',emergency:'Emergency',itinerancy:'Itinerancy',resident:'Resident'};
+const COL_BG     = {green:'var(--green-bg)',red:'var(--red-bg)',violet:'var(--violet-bg)',orange:'var(--orange-bg)',pink:'var(--pink-bg)',brown:'var(--brown-bg)',blue:'var(--blue-bg)',gray:'var(--gray-bg)'};
+const COL_MAIN   = {green:'var(--green)',   red:'var(--red)',   violet:'var(--violet)',   orange:'var(--orange)',  pink:'var(--pink)',   brown:'var(--brown)',   blue:'var(--blue)',   gray:'var(--gray)'  };
+const DEEP  = ['Vacuum the floor','Dust all surfaces','Clean surfaces & desk','Change bed linen & make bed','Change towel','Refill soap / toiletries'];
+const LIGHT = ['Dust all surfaces'];
 
-// ── FLOOR LAYOUTS ─────────────────────────────────────────
-// kind: 'room' | 'stair' | 'lblock' | 'x' | 'void'
-// For grid: we use CSS grid with explicit placement.
-// Layout arrays: each entry = { col, row, kind, ... }
-// Grid is col×row (1-indexed)
-
-const F1_DEFS = [
-  // col 1-2 top row
-  {id:'f1-a1', col:1,row:1, kind:'room'},
-  {id:'f1-a2', col:2,row:1, kind:'room'},
-  // col 1-2 bottom row
-  {id:'f1-b1', col:1,row:2, kind:'room'},
-  {id:'f1-b2', col:2,row:2, kind:'room'},
-  // stair col 3 spans both rows
-  {col:3,row:1, kind:'stair', rowspan:2},
-  // right block top row (col 4-6)
-  {id:'f1-c1', col:4,row:1, kind:'room', defaultType:'priest'},
-  {id:'f1-c2', col:5,row:1, kind:'room'},
-  {id:'f1-c3', col:6,row:1, kind:'room'},
-  // right block bottom row (col 4-6)
-  {id:'f1-d1', col:4,row:2, kind:'room', defaultType:'priest'},
-  {id:'f1-d2', col:5,row:2, kind:'room'},
-  {col:6,row:2, kind:'x'},
+const F1 = [
+  {id:'f1-a1',col:1,row:1,kind:'room'},{id:'f1-a2',col:2,row:1,kind:'room'},
+  {id:'f1-b1',col:1,row:2,kind:'room'},{id:'f1-b2',col:2,row:2,kind:'room'},
+  {col:3,row:1,rowspan:2,kind:'stair'},
+  {id:'f1-c1',col:4,row:1,kind:'room',defaultType:'priest'},
+  {id:'f1-c2',col:5,row:1,kind:'room'},
+  {id:'f1-c3',col:6,row:1,kind:'room'},
+  {id:'f1-d1',col:4,row:2,kind:'room',defaultType:'priest'},
+  {id:'f1-d2',col:5,row:2,kind:'room'},
+  {col:6,row:2,kind:'x'},
+];
+const F2 = [
+  {id:'f2-t1',col:1,row:1,kind:'room',defaultType:'emergency'},
+  {col:2,row:1,kind:'label',label:'ART\nROOM'},
+  {col:3,row:1,rowspan:2,kind:'stair'},
+  {id:'f2-t2',col:4,row:1,kind:'room',defaultType:'emergency'},
+  {id:'f2-t3',col:5,row:1,kind:'room'},{id:'f2-t4',col:6,row:1,kind:'room'},
+  {id:'f2-t5',col:7,row:1,kind:'room'},{id:'f2-t6',col:8,row:1,kind:'room'},
+  {id:'f2-t7',col:9,row:1,kind:'room'},
+  {col:10,row:1,kind:'label',label:'WC'},
+  {col:11,row:1,rowspan:1,kind:'stair'},
+  {id:'f2-b1',col:1,row:2,kind:'room'},{id:'f2-b2',col:2,row:2,kind:'room'},
+  {id:'f2-b3',col:4,row:2,kind:'room'},{id:'f2-b4',col:5,row:2,kind:'room'},
+  {id:'f2-b5',col:6,row:2,kind:'room'},{id:'f2-b6',col:7,row:2,kind:'room'},
+  {id:'f2-b7',col:8,row:2,kind:'room'},{id:'f2-b8',col:9,row:2,kind:'room'},
+  {id:'f2-b9',col:10,row:2,kind:'room'},{id:'f2-b10',col:11,row:2,kind:'room'},
 ];
 
-const F2_DEFS = [
-  // TOP ROW (row 1): col 1=emergency, 2=ART ROOM, 3=stair(span2), 4=emergency, 5-9=rooms, 10=WC, 11=stair
-  {id:'f2-t1', col:1,row:1, kind:'room', defaultType:'emergency'},
-  {col:2,row:1, kind:'lblock', label:'ART\nROOM'},
-  {col:3,row:1, kind:'stair', rowspan:2},
-  {id:'f2-t2', col:4,row:1, kind:'room', defaultType:'emergency'},
-  {id:'f2-t3', col:5,row:1, kind:'room'},
-  {id:'f2-t4', col:6,row:1, kind:'room'},
-  {id:'f2-t5', col:7,row:1, kind:'room'},
-  {id:'f2-t6', col:8,row:1, kind:'room'},
-  {id:'f2-t7', col:9,row:1, kind:'room'},
-  {col:10,row:1, kind:'lblock', label:'WC'},
-  {col:11,row:1, kind:'stair', rowspan:1},
-  // BOTTOM ROW (row 2): col 1-2=rooms, 3=stair(cont), 4-11=rooms
-  {id:'f2-b1', col:1, row:2, kind:'room'},
-  {id:'f2-b2', col:2, row:2, kind:'room'},
-  {id:'f2-b3', col:4, row:2, kind:'room'},
-  {id:'f2-b4', col:5, row:2, kind:'room'},
-  {id:'f2-b5', col:6, row:2, kind:'room'},
-  {id:'f2-b6', col:7, row:2, kind:'room'},
-  {id:'f2-b7', col:8, row:2, kind:'room'},
-  {id:'f2-b8', col:9, row:2, kind:'room'},
-  {id:'f2-b9', col:10,row:2, kind:'room'},
-  {id:'f2-b10',col:11,row:2, kind:'room'},
-];
+function allRoomDefs(){ return [...F1,...F2].filter(d=>d.kind==='room').map(d=>({floor:d.id.startsWith('f1')?'f1':'f2',...d})); }
 
-function allRooms(){
-  return [...F1_DEFS,...F2_DEFS].filter(d=>d.kind==='room').map(d=>({
-    floor: d.id.startsWith('f1')?'f1':'f2', ...d
-  }));
-}
+let rooms={}, curId=null, cleanCk={}, appReady=false;
 
-// ── STATE ─────────────────────────────────────────────────
-let rooms={}, curId=null, cleanSt={}, ready=false;
-const TWO_WEEKS=14*24*3600*1000;
-const DEEP=['Vacuum the floor','Dust all surfaces','Clean surfaces & desk','Change bed linen & make bed','Change towel','Refill soap / toiletries'];
-const LIGHT=['Dust all surfaces'];
+const syncDot = document.getElementById('sync-dot');
+function setSyncStatus(s){ syncDot.className='sync-dot '+(s==='ok'?'ok':s==='saving'?'saving':'err'); }
 
-// ── FIREBASE ──────────────────────────────────────────────
-const syncEl=document.getElementById('sync');
-const setSync=s=>syncEl.className='sync '+(s==='ok'?'ok':s==='saving'?'saving':'err');
-
-onValue(ROOT, snap=>{
+onValue(ref(db,DB_KEY), snap=>{
   const data=snap.val();
   if(!data){
     const init={};
-    allRooms().forEach(d=>{ init[d.id]=mkDefault(d); });
-    set(ROOT,init); return;
+    allRoomDefs().forEach(d=>{init[d.id]=mkDef(d);});
+    set(ref(db,DB_KEY),init);
+    return;
   }
   rooms={};
-  allRooms().forEach(d=>{
+  allRoomDefs().forEach(d=>{
     const s=data[d.id]||{};
+    const def=mkDef(d);
     rooms[d.id]={
-      ...mkDefault(d),
-      type:       s.type       ?? mkDefault(d).type,
-      roomType:   s.roomType   ?? d.defaultType??null,
-      name:       s.name       ?? '',
-      owner:      s.owner      ?? null,
-      from:       s.from       ?? '',
-      to:         s.to         ?? '',
-      notes:      s.notes      ?? '',
-      carpet:     s.carpet     ?? false,
-      greenSince: s.greenSince ?? mkDefault(d).greenSince,
-      configured: s.configured ?? (!!d.defaultType),
+      ...def,
+      type:      s.type      !==undefined?s.type      :def.type,
+      roomType:  s.roomType  !==undefined?s.roomType  :def.roomType,
+      name:      s.name      !==undefined?s.name      :'',
+      owner:     s.owner     !==undefined?s.owner     :null,
+      from:      s.from      !==undefined?s.from      :'',
+      to:        s.to        !==undefined?s.to        :'',
+      notes:     s.notes     !==undefined?s.notes     :'',
+      carpet:    s.carpet    !==undefined?s.carpet    :false,
+      greenSince:s.greenSince!==undefined?s.greenSince:def.greenSince,
+      configured:s.configured!==undefined?s.configured:def.configured,
     };
   });
-  checkTimers();
-  renderAll();
-  setSync('ok');
-  if(!ready){ document.getElementById('loading').style.display='none'; ready=true; }
-},()=>setSync('err'));
+  checkTimers(); renderAll(); setSyncStatus('ok');
+  if(!appReady){document.getElementById('loading').style.display='none';appReady=true;}
+},()=>setSyncStatus('err'));
 
-function mkDefault(d){
+function mkDef(d){
   const color=d.defaultType?(TYPE2COLOR[d.defaultType]||'green'):'';
-  return {
-    id:d.id, floor:d.floor,
-    type:color||'', roomType:d.defaultType||null,
-    name:'', owner:null, from:'', to:'', notes:'', carpet:false,
-    greenSince:color==='green'?Date.now():null,
-    configured:!!d.defaultType,
-  };
+  return {id:d.id,floor:d.floor,type:color,roomType:d.defaultType||null,name:'',owner:null,from:'',to:'',notes:'',carpet:false,greenSince:color==='green'?Date.now():null,configured:!!d.defaultType};
+}
+function saveToDB(r){
+  setSyncStatus('saving');
+  set(ref(db,DB_KEY+'/'+r.id),r).then(()=>setSyncStatus('ok')).catch(()=>setSyncStatus('err'));
 }
 
-function saveDb(r){
-  setSync('saving');
-  set(ref(db,'rmgh_v5/'+r.id),r).then(()=>setSync('ok')).catch(()=>setSync('err'));
-}
-
-// ── TIMERS ────────────────────────────────────────────────
 function checkTimers(){
   const now=Date.now();
   Object.values(rooms).forEach(r=>{
-    if(r.type==='green'&&r.greenSince&&now-r.greenSince>=TWO_WEEKS){ r.type='violet';r.greenSince=null;saveDb(r); }
-    if(r.type==='red'&&r.to&&now>new Date(r.to+'T23:59:59').getTime()){ r.type='orange';saveDb(r); }
+    if(!r.configured)return;
+    if(r.type==='green'&&r.greenSince&&now-r.greenSince>=TWO_WEEKS){r.type='violet';r.greenSince=null;saveToDB(r);}
+    if(r.type==='red'&&r.to&&now>new Date(r.to+'T23:59:59').getTime()){r.type='orange';saveToDB(r);}
   });
 }
-
 function daysLeft(r){
   if(r.type!=='green'||!r.greenSince)return null;
   const rem=TWO_WEEKS-(Date.now()-r.greenSince);
   return rem<=0?0:Math.ceil(rem/86400000);
 }
-
-// ── HELPERS ───────────────────────────────────────────────
 const fmt=s=>s?new Date(s+'T12:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit'}):'';
 const today=()=>new Date().toISOString().split('T')[0];
-function yearFrom(s){ const d=new Date((s||today())+'T12:00:00');d.setFullYear(d.getFullYear()+1);d.setDate(d.getDate()-1);return d.toISOString().split('T')[0]; }
-const isPriest=r=>r.roomType==='priest';
+function yearFrom(s){const d=new Date((s||today())+'T12:00:00');d.setFullYear(d.getFullYear()+1);d.setDate(d.getDate()-1);return d.toISOString().split('T')[0];}
 
-// ── RENDER FLOOR ──────────────────────────────────────────
-function renderFloor(defs, planEl){
-  // find grid dimensions
+function renderFloor(defs,gridEl){
   const maxC=Math.max(...defs.map(d=>d.col+(d.colspan||1)-1));
   const maxR=Math.max(...defs.map(d=>d.row+(d.rowspan||1)-1));
-  const CELL=`calc(var(--CELL))`;
-  planEl.style.gridTemplateColumns=`repeat(${maxC}, var(--CELL))`;
-  planEl.style.gridTemplateRows=`repeat(${maxR}, var(--CELL))`;
-  planEl.innerHTML='';
-
+  gridEl.style.gridTemplateColumns=`repeat(${maxC},var(--cell))`;
+  gridEl.style.gridTemplateRows   =`repeat(${maxR},var(--cell))`;
+  gridEl.innerHTML='';
   defs.forEach(d=>{
+    const cs=d.colspan||1,rs=d.rowspan||1;
+    const pl=`grid-column:${d.col}/span ${cs};grid-row:${d.row}/span ${rs};`;
     let el;
-    const cs=d.colspan||1, rs=d.rowspan||1;
-    const style=`grid-column:${d.col}/span ${cs};grid-row:${d.row}/span ${rs};`;
-
     if(d.kind==='stair'){
-      el=document.createElement('div');
-      el.className='stair';
-      el.style.cssText=style+`height:calc(var(--CELL)*${rs} + var(--GAP)*(${rs}-1))`;
-      el.innerHTML=`<div class="stair-lbl">S T A I R S</div>`;
-    } else if(d.kind==='lblock'){
-      el=document.createElement('div');
-      el.className='lblock';
-      el.style.cssText=style;
+      el=document.createElement('div');el.className='stair-cell';
+      el.style.cssText=pl+`height:calc(var(--cell)*${rs}+var(--gap)*(${rs}-1));`;
+      el.innerHTML=`<div class="stair-label">S T A I R S</div>`;
+    } else if(d.kind==='label'){
+      el=document.createElement('div');el.className='label-cell';el.style.cssText=pl;
       el.innerHTML=`<span>${(d.label||'').replace('\n','<br>')}</span>`;
     } else if(d.kind==='x'){
-      el=document.createElement('div');
-      el.className='cell c-x';
-      el.style.cssText=style;
+      el=document.createElement('div');el.className='room-cell excluded';el.style.cssText=pl;
     } else if(d.kind==='room'){
-      el=renderRoomCell(rooms[d.id], style);
+      el=buildCell(rooms[d.id],pl);
     }
-    if(el) planEl.appendChild(el);
+    if(el)gridEl.appendChild(el);
   });
 }
 
-function renderRoomCell(r, style){
-  if(!r) return null;
+function buildCell(r,pl){
+  if(!r)return null;
   const el=document.createElement('div');
-  const configured=r.configured&&r.type;
-
-  if(!configured){
-    el.className='cell c-empty';
-    el.style.cssText=style;
-    el.onclick=()=>openModal(r.id);
-    el.innerHTML=`<div class="ct" style="opacity:1">Tap to<br>configure</div>`;
+  el.style.cssText=pl;
+  el.onclick=()=>openModal(r.id);
+  if(!r.configured||!r.type){
+    el.className='room-cell empty';
+    el.innerHTML=`<div class="cell-hint">Tap to<br>configure</div>`;
     return el;
   }
-
-  const t=r.type;
-  el.className=`cell c-${t}${r.carpet?' carpet':''}`;
-  el.style.cssText=style;
-  el.onclick=()=>openModal(r.id);
-
+  el.className=`room-cell ${r.type}${r.carpet?' carpet':''}`;
   const dl=daysLeft(r);
-  const timer=(dl!==null&&dl<=7)?`<div class="tbadge">${dl}d</div>`:'';
-  const label=r.roomType?TYPE_LABEL[r.roomType]||r.roomType:'';
-  const name=r.name||(t==='green'?'Available':'');
-  const dates=(r.from&&r.to)?`${fmt(r.from)}→${fmt(r.to)}`:'';
-
+  const timer=(dl!==null&&dl<=7)?`<div class="timer-badge">${dl}d</div>`:'';
   el.innerHTML=`
     ${timer}
-    <div class="ct">${label}</div>
-    <div class="cn">${name}</div>
-    ${dates?`<div class="cd">${dates}</div>`:''}
+    <div class="cell-type">${r.roomType?TYPE_LBL[r.roomType]||'':''}</div>
+    <div class="cell-name">${r.name||(r.type==='green'?'Available':'')}</div>
+    ${(r.from&&r.to)?`<div class="cell-dates">${fmt(r.from)} → ${fmt(r.to)}</div>`:''}
   `;
   return el;
 }
 
-function renderStats(floorId){
-  const fr=Object.values(rooms).filter(r=>r.floor===floorId&&r.configured&&r.type);
-  const avail=fr.filter(r=>r.type==='green').length;
-  const occ=fr.filter(r=>r.type==='red').length;
+function renderStats(fid){
+  const fr=Object.values(rooms).filter(r=>r.floor===fid&&r.configured&&r.type);
+  const av=fr.filter(r=>r.type==='green').length;
+  const oc=fr.filter(r=>r.type==='red').length;
   const dc=fr.filter(r=>r.type==='orange').length;
   const lc=fr.filter(r=>r.type==='violet').length;
-  let h=`<div class="sp" style="background:var(--green-m);border-color:var(--green);color:var(--green)">${avail} available</div>`;
-  if(occ) h+=`<div class="sp" style="background:var(--red-m);border-color:var(--red);color:var(--red)">${occ} occupied</div>`;
-  if(dc)  h+=`<div class="sp" style="background:var(--orange-m);border-color:var(--orange);color:var(--orange)">${dc} deep clean</div>`;
-  if(lc)  h+=`<div class="sp" style="background:var(--violet-m);border-color:var(--violet);color:var(--violet)">${lc} refreshing</div>`;
-  document.getElementById('sb-'+floorId).innerHTML=h;
+  let h=`<div class="stat-chip" style="background:var(--green-bg);border-color:var(--green);color:var(--green)">${av} available</div>`;
+  if(oc)h+=`<div class="stat-chip" style="background:var(--red-bg);border-color:var(--red);color:var(--red)">${oc} occupied</div>`;
+  if(dc)h+=`<div class="stat-chip" style="background:var(--orange-bg);border-color:var(--orange);color:var(--orange)">${dc} deep clean</div>`;
+  if(lc)h+=`<div class="stat-chip" style="background:var(--violet-bg);border-color:var(--violet);color:var(--violet)">${lc} refreshing</div>`;
+  document.getElementById('stats-'+fid).innerHTML=h;
 }
-
 function renderAll(){
-  renderFloor(F1_DEFS, document.getElementById('plan-f1'));
-  renderFloor(F2_DEFS, document.getElementById('plan-f2'));
-  renderStats('f1'); renderStats('f2');
+  renderFloor(F1,document.getElementById('grid-f1'));
+  renderFloor(F2,document.getElementById('grid-f2'));
+  renderStats('f1');renderStats('f2');
 }
 
-// ── TABS ──────────────────────────────────────────────────
-window.goTab=function(id){
-  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',['f1','f2','si'][i]===id));
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  document.getElementById('page-'+id).classList.add('on');
+window.switchTab=function(id){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['f1','f2','si'][i]===id));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
 };
 
-// ── MODAL ─────────────────────────────────────────────────
+/* ── helpers for building modal DOM ── */
+function mkSec(t){const d=document.createElement('div');d.className='form-section';d.textContent=t;return d;}
+function mkNote(t){const d=document.createElement('div');d.className='info-note';d.textContent=t;return d;}
+function mkInp(lbl,id,val,type){
+  const g=document.createElement('div');g.className='form-group';
+  g.innerHTML=`<div class="form-label">${lbl}</div><input class="form-input" id="${id}" type="${type}" value="${val||''}" autocomplete="off">`;
+  return g;
+}
+function mkSel(lbl,id,opts,sel){
+  const g=document.createElement('div');g.className='form-group';
+  const os=opts.map(o=>`<option value="${o.v}"${o.v===sel?' selected':''}>${o.l}</option>`).join('');
+  g.innerHTML=`<div class="form-label">${lbl}</div><select class="form-input" id="${id}">${os}</select>`;
+  return g;
+}
+function mkCarpetRow(isOn){
+  const row=document.createElement('div');row.className='carpet-row';
+  row.innerHTML=`
+    <div class="carpet-label">Has carpet<small>Affects cleaning checklist</small></div>
+    <button type="button" class="toggle-sw${isOn?' on':''}" id="carpet-toggle"></button>`;
+  // Use setTimeout 0 so element is in DOM before we attach listener
+  setTimeout(()=>{
+    const btn=document.getElementById('carpet-toggle');
+    if(btn) btn.addEventListener('click',()=>btn.classList.toggle('on'));
+  },0);
+  return row;
+}
+function mkCleanBox(cls,title,items){
+  const box=document.createElement('div');box.className=`clean-box ${cls}`;
+  box.innerHTML=`<div class="clean-box-title">${title}</div>`;
+  items.forEach((lbl,i)=>{
+    cleanCk[i]=false;
+    const item=document.createElement('div');item.className='clean-item';
+    item.innerHTML=`<div class="clean-cb" id="chk-${i}"></div><div class="clean-item-lbl" id="lbl-${i}">${lbl}</div>`;
+    item.addEventListener('click',()=>{
+      cleanCk[i]=!cleanCk[i];
+      const chk=document.getElementById('chk-'+i);
+      const l=document.getElementById('lbl-'+i);
+      chk.classList.toggle('checked',cleanCk[i]);
+      chk.textContent=cleanCk[i]?'✓':'';
+      l.classList.toggle('done',cleanCk[i]);
+    });
+    box.appendChild(item);
+  });
+  const btn=document.createElement('button');btn.className='clean-done-btn';btn.textContent='✓ Done — mark as available';
+  btn.addEventListener('click',()=>{
+    const r=rooms[curId];
+    r.type='green';r.greenSince=Date.now();r.name=r.owner||'';r.from='';r.to='';
+    saveToDB(r);renderAll();closeModal();showToast('Room cleaned & available ✓');
+  });
+  box.appendChild(btn);return box;
+}
+
 window.openModal=function(id){
-  const r=rooms[id]; if(!r)return;
-  curId=id; cleanSt={};
-  const body=document.getElementById('mbody');
-  body.innerHTML='';
-
+  const r=rooms[id];if(!r)return;
+  curId=id;cleanCk={};
+  const body=document.getElementById('modal-body');body.innerHTML='';
   const t=r.type||'';
-  const badge=document.getElementById('mbadge');
-  badge.style.background=COLOR_BG[t]||'var(--surface2)';
-  badge.style.borderColor=COLOR_MAIN[t]||'var(--border)';
-  badge.style.color=COLOR_MAIN[t]||'var(--text3)';
-  badge.textContent=r.name?r.name.charAt(0).toUpperCase():'?';
-  document.getElementById('mtitle').textContent=r.name||'Room';
-  document.getElementById('msub').textContent=(r.roomType?TYPE_LABEL[r.roomType]:'Not configured')+(r.carpet?' · 🪵 carpet':'');
-  document.getElementById('bsv').textContent='Save';
 
-  // NOT CONFIGURED
-  if(!r.configured||!r.type){
-    body.appendChild(sep('Configure Room'));
-    body.appendChild(sel('Room type','m-rt',[
-      {v:'normal',l:'Normal (guest room)'},
-      {v:'priest',l:'Priest room'},
-      {v:'fixed', l:'Fixed (seminarian / student)'},
-      {v:'emergency',l:'Emergency room'},
-      {v:'itinerancy',l:'Annual itinerancy'},
-      {v:'resident',l:'Resident'},
+  // header
+  const icon=document.getElementById('modal-icon');
+  icon.style.background  =COL_BG[t]  ||'var(--surface2)';
+  icon.style.borderColor =COL_MAIN[t]||'var(--border)';
+  icon.style.color       =COL_MAIN[t]||'var(--text3)';
+  icon.textContent=r.name?r.name[0].toUpperCase():'?';
+  document.getElementById('modal-title').textContent=r.name||'Room';
+  document.getElementById('modal-sub').textContent=(r.roomType?TYPE_LBL[r.roomType]:'Not configured')+(r.carpet?' · 🪵 Carpet':'');
+  document.getElementById('btn-save').textContent='Save';
+
+  /* NOT CONFIGURED */
+  if(!r.configured||!t){
+    body.appendChild(mkSec('Configure Room'));
+    body.appendChild(mkSel('Room type','m-rt',[
+      {v:'normal',l:'Normal (guest room)'},{v:'priest',l:'Priest room'},
+      {v:'fixed',l:'Fixed (seminarian / student)'},{v:'emergency',l:'Emergency room'},
+      {v:'itinerancy',l:'Annual itinerancy'},{v:'resident',l:'Resident'},
     ],r.roomType||'normal'));
-    body.appendChild(inp('Name / Occupant','m-name',r.name,'text'));
-    body.appendChild(trow('Has carpet','m-carp',r.carpet));
-    body.appendChild(inp('Notes','m-notes',r.notes,'text'));
-    document.getElementById('bsv').textContent='Configure & Save';
-    show(); return;
+    body.appendChild(mkInp('Name / Occupant','m-name',r.name,'text'));
+    body.appendChild(mkCarpetRow(r.carpet));
+    body.appendChild(mkInp('Notes','m-notes',r.notes,'text'));
+    document.getElementById('btn-save').textContent='Configure & Save';
+    openSheet();return;
   }
 
-  // DEEP CLEAN
-  if(t==='orange'){ body.appendChild(cleanBox('deep')); body.appendChild(note('🧹 Deep clean required. Tick off tasks then mark as done.')); show(); return; }
-  // LIGHT CLEAN
-  if(t==='violet'){ body.appendChild(cleanBox('light')); body.appendChild(note('🪣 Light refresh needed (free for 2+ weeks).')); show(); return; }
+  /* DEEP CLEAN */
+  if(t==='orange'){body.appendChild(mkCleanBox('deep-clean','🧹 Deep Cleaning Required',DEEP));body.appendChild(mkNote('Tick off each task, then mark as done.'));openSheet();return;}
+  /* LIGHT CLEAN */
+  if(t==='violet'){body.appendChild(mkCleanBox('light-clean','🪣 Light Refresh Required',LIGHT));body.appendChild(mkNote('Room has been free for 2 weeks. A light dust is needed.'));openSheet();return;}
 
-  // RESTORE (priest with temp guest)
-  if(isPriest(r)&&r.owner&&r.name!==r.owner){
-    const rb=document.createElement('div');
-    rb.className='rbox';
-    rb.innerHTML=`<div class="rlbl">Owner: <strong>${r.owner}</strong></div><button class="rbtn" onclick="doRestore()">↩ Restore</button>`;
+  /* RESTORE (priest temp guest) */
+  if(r.roomType==='priest'&&r.owner&&r.name!==r.owner){
+    const rb=document.createElement('div');rb.className='restore-box';
+    rb.innerHTML=`<div class="restore-lbl">Owner: <strong>${r.owner}</strong></div><button class="restore-btn" onclick="doRestore()">↩ Restore</button>`;
     body.appendChild(rb);
   }
 
-  // STATUS (normal / emergency)
+  /* STATUS */
   if(r.roomType==='normal'||r.roomType==='emergency'){
-    body.appendChild(sep('Status'));
-    const sb=document.createElement('div');
-    sb.className='sbtns';
-    sb.innerHTML=`
-      <button class="sbtn sg ${t==='green'?'on':''}" id="bs-g" onclick="setSt('green')">✓ Available</button>
-      <button class="sbtn sr ${t==='red'?'on':''}"   id="bs-r" onclick="setSt('red')">● Occupied</button>
-    `;
-    body.appendChild(sb);
+    body.appendChild(mkSec('Status'));
+    const sr=document.createElement('div');sr.className='status-row';
+    sr.innerHTML=`
+      <button class="status-btn ${t==='green'?'active-green':''}" id="sbg" onclick="setSt('green')">✓ Available</button>
+      <button class="status-btn ${t==='red'?'active-red':''}"   id="sbr" onclick="setSt('red')">● Occupied</button>`;
+    body.appendChild(sr);
   }
 
-  // OCCUPANT
-  body.appendChild(sep('Occupant'));
-  body.appendChild(inp('Name','m-name',r.name,'text'));
+  /* OCCUPANT */
+  body.appendChild(mkSec('Occupant'));
+  body.appendChild(mkInp('Name','m-name',r.name,'text'));
 
-  // DATES
-  body.appendChild(sep('Stay'));
-  const fr=document.createElement('div'); fr.className='frow';
-  fr.appendChild(inp('From','m-from',r.from,'date'));
-  fr.appendChild(inp('To','m-to',r.to,'date'));
+  /* DATES */
+  body.appendChild(mkSec('Stay period'));
+  const fr=document.createElement('div');fr.className='form-row';
+  fr.appendChild(mkInp('From','m-from',r.from,'date'));
+  fr.appendChild(mkInp('To','m-to',r.to,'date'));
   body.appendChild(fr);
-  const dq=document.createElement('div'); dq.className='dq';
-  dq.innerHTML=`<button class="qb" onclick="doFullYear()">📅 Full year</button><button class="qb" onclick="doFromToday()">📅 From today</button>`;
+  const dq=document.createElement('div');dq.className='date-shortcuts';
+  dq.innerHTML=`<button class="shortcut-btn" onclick="doFullYear()">📅 Full year</button><button class="shortcut-btn" onclick="doFromToday()">📅 From today</button>`;
   body.appendChild(dq);
 
-  // SETTINGS
-  body.appendChild(sep('Settings'));
-  body.appendChild(trow('Has carpet','m-carp',r.carpet));
-  body.appendChild(inp('Notes','m-notes',r.notes,'text'));
+  /* SETTINGS */
+  body.appendChild(mkSec('Room settings'));
+  body.appendChild(mkCarpetRow(r.carpet));
+  body.appendChild(mkInp('Notes','m-notes',r.notes,'text'));
 
-  // RECONFIGURE
-  const rcfg=document.createElement('button');
-  rcfg.className='bdgr'; rcfg.textContent='⚙ Change room type';
-  rcfg.onclick=()=>{ rooms[curId].configured=false; rooms[curId].type=''; openModal(curId); };
-  body.appendChild(rcfg);
+  /* RECONFIGURE */
+  const rc=document.createElement('button');rc.className='btn-reconfig';rc.textContent='⚙ Change room type';
+  rc.onclick=()=>{rooms[curId].configured=false;rooms[curId].type='';openModal(curId);};
+  body.appendChild(rc);
 
-  // TIMER INFO
-  if(t==='green'&&r.greenSince){ const dl=daysLeft(r); if(dl!==null&&dl<=10) body.appendChild(note(`⏱ ${dl} day${dl!==1?'s':''} until refresh needed.`)); }
+  /* TIMER */
+  if(t==='green'&&r.greenSince){const dl=daysLeft(r);if(dl!==null&&dl<=10)body.appendChild(mkNote(`⏱ ${dl} day${dl!==1?'s':''} until refresh needed.`));}
 
-  show();
+  openSheet();
 };
 
-function show(){ document.getElementById('overlay').classList.add('on'); setTimeout(()=>document.getElementById('mbody').scrollTop=0,10); }
-
-// helpers
-function sep(lbl){ const d=document.createElement('div');d.className='sep';d.textContent=lbl;return d; }
-function note(txt){ const d=document.createElement('div');d.className='infonote';d.textContent=txt;return d; }
-function inp(label,id,val='',type='text'){
-  const g=document.createElement('div');g.className='fg';
-  g.innerHTML=`<div class="fl">${label}</div><input class="fi" id="${id}" type="${type}" value="${val||''}" autocomplete="off">`;
-  return g;
-}
-function sel(label,id,opts,sel){
-  const g=document.createElement('div');g.className='fg';
-  const os=opts.map(o=>`<option value="${o.v}"${o.v===sel?' selected':''}>${o.l}</option>`).join('');
-  g.innerHTML=`<div class="fl">${label}</div><select class="fi" id="${id}">${os}</select>`;
-  return g;
-}
-function trow(lbl,id,val){
-  const d=document.createElement('div');d.className='trow';
-  d.innerHTML=`<span class="tlbl">${lbl}</span><button class="tgl ${val?'on':''}" id="${id}" onclick="this.classList.toggle('on')"></button>`;
-  return d;
-}
-function cleanBox(type){
-  const items=type==='deep'?DEEP:LIGHT;
-  const box=document.createElement('div');box.className=`cbox ${type}`;
-  box.innerHTML=`<div class="ctitle">${type==='deep'?'🧹 Deep Cleaning':'🪣 Light Refresh'}</div>`;
-  items.forEach((lbl,i)=>{
-    cleanSt[i]=false;
-    const row=document.createElement('div');row.className='citem';
-    row.innerHTML=`<div class="ccb" id="cb${i}"></div><div class="clbl" id="cl${i}">${lbl}</div>`;
-    row.onclick=()=>{ cleanSt[i]=!cleanSt[i]; const cb=document.getElementById('cb'+i),cl=document.getElementById('cl'+i); cb.classList.toggle('on',cleanSt[i]);cb.classList.toggle(type,cleanSt[i]);cb.textContent=cleanSt[i]?'✓':'';cl.classList.toggle('done',cleanSt[i]); };
-    box.appendChild(row);
-  });
-  const btn=document.createElement('button');btn.className='cdone';btn.textContent='✓ Done — mark as available';
-  btn.onclick=()=>{ const r=rooms[curId];r.type='green';r.greenSince=Date.now();r.name=r.owner||'';r.from='';r.to='';saveDb(r);renderAll();closeModal();toast('Room available ✓'); };
-  box.appendChild(btn);
-  return box;
+function openSheet(){
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(()=>{document.getElementById('modal-body').scrollTop=0;},15);
 }
 
-// ── ACTIONS ───────────────────────────────────────────────
 window.setSt=function(s){
   const r=rooms[curId];if(!r)return;
-  r.type=s; if(s==='green')r.greenSince=Date.now(); else r.greenSince=null;
-  ['g','r'].forEach(x=>{ const b=document.getElementById('bs-'+x);if(b)b.classList.toggle('on',x===(s==='green'?'g':'r')); });
+  r.type=s;r.greenSince=s==='green'?Date.now():null;
+  const bg=document.getElementById('sbg'),br=document.getElementById('sbr');
+  if(bg)bg.className='status-btn'+(s==='green'?' active-green':'');
+  if(br)br.className='status-btn'+(s==='red'?' active-red':'');
 };
-window.doRestore=function(){ const r=rooms[curId];if(!r||!r.owner)return;r.name=r.owner;r.from='';r.to='';saveDb(r);renderAll();toast(`↩ Restored to ${r.owner}`);closeModal(); };
-window.doFullYear=function(){ const f=today();const fi=document.getElementById('m-from'),ti=document.getElementById('m-to');if(fi)fi.value=f;if(ti)ti.value=yearFrom(f); };
-window.doFromToday=function(){ const fi=document.getElementById('m-from');if(fi)fi.value=today(); };
+window.doRestore=function(){
+  const r=rooms[curId];if(!r||!r.owner)return;
+  r.name=r.owner;r.from='';r.to='';
+  saveToDB(r);renderAll();showToast(`↩ Restored to ${r.owner}`);closeModal();
+};
+window.doFullYear=function(){
+  const f=today();
+  const fi=document.getElementById('m-from'),ti=document.getElementById('m-to');
+  if(fi)fi.value=f;if(ti)ti.value=yearFrom(f);
+};
+window.doFromToday=function(){const fi=document.getElementById('m-from');if(fi)fi.value=today();};
 
 window.saveRoom=function(){
   const r=rooms[curId];if(!r)return;
-  const g=id=>{ const el=document.getElementById(id);return el?el.value.trim():''; };
-  const gb=id=>{ const el=document.getElementById(id);return el?el.classList.contains('on'):false; };
+  const gv=id=>{const el=document.getElementById(id);return el?el.value.trim():'';}
+  const gc=()=>{const el=document.getElementById('carpet-toggle');return el?el.classList.contains('on'):false;}
 
   if(!r.configured||!r.type){
     const rt=document.getElementById('m-rt');
     r.roomType=rt?rt.value:'normal';
-    r.name=g('m-name');
+    r.name=gv('m-name');
     r.owner=(r.roomType==='priest'&&r.name)?r.name:null;
-    r.carpet=gb('m-carp');
-    r.notes=g('m-notes');
-    r.type=TYPE2COLOR[r.roomType]||'green';
-    r.configured=true;
+    r.carpet=gc();r.notes=gv('m-notes');
+    r.type=TYPE2COLOR[r.roomType]||'green';r.configured=true;
     if(r.type==='green')r.greenSince=Date.now();
-    saveDb(r);renderAll();closeModal();toast('Room configured ✓');return;
+    saveToDB(r);renderAll();closeModal();showToast('Room configured ✓');return;
   }
+  const prev=r.type;
+  r.name=gv('m-name');
+  const mf=document.getElementById('m-from'),mt=document.getElementById('m-to');
+  if(mf)r.from=mf.value;if(mt)r.to=mt.value;
+  r.carpet=gc();r.notes=gv('m-notes');
 
-  const prevType=r.type;
-  const nm=g('m-name'),mf=document.getElementById('m-from'),mt=document.getElementById('m-to');
-  r.name=nm;
-  if(mf)r.from=mf.value;
-  if(mt)r.to=mt.value;
-  r.carpet=gb('m-carp');
-  r.notes=g('m-notes');
-
-  // occupied → available means guest left → deep clean
-  if(prevType==='red'&&r.type==='green'){
+  if(prev==='red'&&r.type==='green'){
     r.type='orange';r.greenSince=null;r.name=r.owner||'';r.from='';r.to='';
-    saveDb(r);renderAll();closeModal();toast('Room freed — deep clean needed 🧹');return;
+    saveToDB(r);renderAll();closeModal();showToast('Room freed — deep clean needed 🧹');return;
   }
-  saveDb(r);renderAll();closeModal();toast('Saved ✓');
+  saveToDB(r);renderAll();closeModal();showToast('Saved ✓');
 };
 
 window.closeModal=function(){
-  curId=null;cleanSt={};
-  document.getElementById('overlay').classList.remove('on');
+  curId=null;cleanCk={};
+  document.getElementById('modal-overlay').classList.remove('open');
 };
 
-function toast(msg){ const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2600); }
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
 
-// ── INIT ──────────────────────────────────────────────────
-document.getElementById('dpill').textContent=new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-document.getElementById('overlay').addEventListener('click',e=>{ if(e.target===document.getElementById('overlay'))closeModal(); });
-setSync('saving');
-setInterval(()=>{ checkTimers();renderAll(); },30*60*1000);
+document.getElementById('date-chip').textContent=
+  new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+document.getElementById('modal-overlay').addEventListener('click',e=>{
+  if(e.target===document.getElementById('modal-overlay'))closeModal();
+});
+setSyncStatus('saving');
+setInterval(()=>{checkTimers();renderAll();},30*60*1000);
 </script>
 
 </body>
