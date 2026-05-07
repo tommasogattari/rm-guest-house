@@ -18,6 +18,7 @@
   --pink:#B04068; --pink-bg:#F5D0E0; --pink-lt:#FBF0F5;
   --brown:#7A5428;--brown-bg:#E8D4B0;--brown-lt:#F5EEE3;
   --blue:#245C9A; --blue-bg:#C8DCEF; --blue-lt:#EBF3FB;
+  --lblue:#1A7AAA;--lblue-bg:#BEE3F5;--lblue-lt:#E8F6FD;
   --gray:#555050; --gray-bg:#DDDAD5; --gray-lt:#F0EEEB;
   --cell:92px;--gap:8px;
 }
@@ -72,13 +73,18 @@ header{position:sticky;top:0;z-index:500;background:#FFFFFF;border-bottom:1px so
 .room-cell.pink   {background:var(–pink-lt);  border-color:var(–pink)}
 .room-cell.brown  {background:var(–brown-lt); border-color:var(–brown)}
 .room-cell.blue   {background:var(–blue-lt);  border-color:var(–blue)}
+.room-cell.lblue  {background:var(–lblue-lt); border-color:var(–lblue)}
 .room-cell.gray   {background:var(–gray-lt);  border-color:var(–gray)}
 .room-cell.empty  {background:#E8E4DA;border:2.5px dashed #B0A898}
+/* violet dot on green cell (approaching 2-week refresh) */
+.room-cell.green.needs-refresh::before{content:’’;position:absolute;top:6px;left:6px;width:9px;height:9px;border-radius:50%;background:var(–violet);border:1.5px solid #FFFFFF;z-index:1}
 .room-cell.excluded{background:var(–bg);border:2px dashed #CCC;cursor:default}
 .room-cell.excluded::before,.room-cell.excluded::after{content:’’;position:absolute;background:#CCC;width:130%;height:2px;top:50%;left:-15%}
 .room-cell.excluded::before{transform:rotate(30deg)}.room-cell.excluded::after{transform:rotate(-30deg)}
-/* carpet stripe at bottom */
-.room-cell.carpet::after{content:’’;position:absolute;bottom:0;left:0;right:0;height:5px;border-radius:0 0 8px 8px;opacity:.5}
+/* NO-CARPET indicator (small icon top-right when room has NO carpet) */
+.room-cell .no-carpet-icon{position:absolute;top:5px;right:5px;font-size:11px;opacity:.7;line-height:1}
+/* carpet stripe at bottom — shown when carpet=true (default) */
+.room-cell.carpet::after{content:’’;position:absolute;bottom:0;left:0;right:0;height:5px;border-radius:0 0 8px 8px;opacity:.45}
 .room-cell.green.carpet::after  {background:var(–green)}
 .room-cell.red.carpet::after    {background:var(–red)}
 .room-cell.violet.carpet::after {background:var(–violet)}
@@ -86,6 +92,7 @@ header{position:sticky;top:0;z-index:500;background:#FFFFFF;border-bottom:1px so
 .room-cell.pink.carpet::after   {background:var(–pink)}
 .room-cell.brown.carpet::after  {background:var(–brown)}
 .room-cell.blue.carpet::after   {background:var(–blue)}
+.room-cell.lblue.carpet::after  {background:var(–lblue)}
 .room-cell.gray.carpet::after   {background:var(–gray)}
 .room-cell.empty.carpet::after  {background:#B0A898}
 /* cell text */
@@ -100,6 +107,7 @@ header{position:sticky;top:0;z-index:500;background:#FFFFFF;border-bottom:1px so
 .room-cell.pink .cell-type   {color:var(–pink)}
 .room-cell.brown .cell-type  {color:var(–brown)}
 .room-cell.blue .cell-type   {color:var(–blue)}
+.room-cell.lblue .cell-type  {color:var(–lblue)}
 .room-cell.gray .cell-type   {color:var(–gray)}
 .timer-badge{position:absolute;top:5px;right:5px;font-size:8px;font-weight:700;background:#FFFFFF;color:var(–violet);border:1px solid var(–violet);padding:2px 4px;border-radius:4px}
 
@@ -108,6 +116,8 @@ header{position:sticky;top:0;z-index:500;background:#FFFFFF;border-bottom:1px so
 .stair-label{font-size:9px;font-weight:700;letter-spacing:3px;color:var(–text3);writing-mode:vertical-rl}
 .label-cell{width:var(–cell);height:var(–cell);border-radius:10px;border:2px solid var(–border);background:var(–surface2);display:flex;align-items:center;justify-content:center;text-align:center;padding:6px}
 .label-cell span{font-size:10px;font-weight:700;color:var(–text2);line-height:1.4;letter-spacing:.3px}
+.rector-cell{background:#EDE8DF;border-color:#B8A898;}
+.rector-cell span{color:#7A6858;font-size:10px;font-weight:700;}
 
 /* ===================== MODAL ===================== */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;align-items:flex-end;justify-content:center}
@@ -156,8 +166,9 @@ select.form-input{cursor:pointer}
 /* STATUS BUTTONS */
 .status-row{display:flex;gap:8px}
 .status-btn{flex:1;font-family:‘DM Sans’,sans-serif;font-size:13px;font-weight:600;padding:12px 10px;border-radius:10px;text-align:center;border:2px solid var(–border);background:#FFFFFF;color:var(–text2);cursor:pointer;transition:all .15s}
-.status-btn.active-green{background:var(–green-bg);color:var(–green);border-color:var(–green)}
-.status-btn.active-red  {background:var(–red-bg);  color:var(–red);  border-color:var(–red)}
+.status-btn.active-green {background:var(–green-bg);color:var(–green);border-color:var(–green)}
+.status-btn.active-red   {background:var(–red-bg);  color:var(–red);  border-color:var(–red)}
+.status-btn.active-orange{background:var(–orange-bg);color:var(–orange);border-color:var(–orange)}
 
 /* RESTORE */
 .restore-box{background:var(–pink-lt);border:1.5px solid var(–pink);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -221,13 +232,15 @@ select.form-input{cursor:pointer}
 <div class="page active" id="page-f1">
   <div class="statsbar" id="stats-f1"></div>
   <div class="legend">
-    <div class="leg-item"><div class="leg-dot" style="background:var(--green-lt);border-color:var(--green)"></div>Available</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--red-lt);border-color:var(--red)"></div>Occupied</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--orange-lt);border-color:var(--orange)"></div>Deep clean</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--violet-lt);border-color:var(--violet)"></div>Refreshing</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--pink-lt);border-color:var(--pink)"></div>Priest</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--blue-lt);border-color:var(--blue)"></div>Emergency</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--brown-lt);border-color:var(--brown)"></div>Fixed</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--green-lt);border-color:var(--green)"></div>Available (guest room)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--orange-lt);border-color:var(--orange)"></div>Occupied by guest</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--red-lt);border-color:var(--red)"></div>Needs deep clean</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--violet-lt);border-color:var(--violet)"></div>Needs light refresh (2 weeks)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--green-lt);border-color:var(--green);position:relative;overflow:visible"><span style="position:absolute;top:-2px;left:-2px;width:7px;height:7px;border-radius:50%;background:var(--violet);border:1px solid white;display:block"></span></div>Available — refresh soon</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--pink-lt);border-color:var(--pink)"></div>Priest room</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--brown-lt);border-color:var(--brown)"></div>Fixed (seminarian/student)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--blue-lt);border-color:var(--blue)"></div>Itinerancy</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--lblue-lt);border-color:var(--lblue)"></div>Emergency room</div>
   </div>
   <div class="plan-scroll"><div class="plan-grid" id="grid-f1"></div></div>
 </div>
@@ -279,32 +292,41 @@ const fbApp = initializeApp({
   databaseURL:"https://rm-guest-room-default-rtdb.europe-west1.firebasedatabase.app"
 });
 const db = getDatabase(fbApp);
-const DB_KEY = 'rmgh_v6';
+const DB_KEY = 'rmgh_v9';
 
 const TWO_WEEKS = 14*24*3600*1000;
-const TYPE2COLOR = {normal:'green',priest:'pink',fixed:'brown',emergency:'blue',itinerancy:'blue',resident:'gray'};
+// Color when first configured (fixed rooms get their color immediately)
+// Guest rooms start green (available), become orange when occupied, red when guest leaves, violet after 2 weeks
+const TYPE2COLOR = {normal:'green',priest:'pink',fixed:'brown',emergency:'lblue',itinerancy:'blue',resident:'gray'};
 const TYPE_LBL   = {normal:'Normal',priest:'Priest',fixed:'Fixed',emergency:'Emergency',itinerancy:'Itinerancy',resident:'Resident'};
-const COL_BG     = {green:'var(--green-bg)',red:'var(--red-bg)',violet:'var(--violet-bg)',orange:'var(--orange-bg)',pink:'var(--pink-bg)',brown:'var(--brown-bg)',blue:'var(--blue-bg)',gray:'var(--gray-bg)'};
-const COL_MAIN   = {green:'var(--green)',   red:'var(--red)',   violet:'var(--violet)',   orange:'var(--orange)',  pink:'var(--pink)',   brown:'var(--brown)',   blue:'var(--blue)',   gray:'var(--gray)'  };
+const COL_BG     = {green:'var(--green-bg)',red:'var(--red-bg)',violet:'var(--violet-bg)',orange:'var(--orange-bg)',pink:'var(--pink-bg)',brown:'var(--brown-bg)',blue:'var(--blue-bg)',lblue:'var(--lblue-bg)',gray:'var(--gray-bg)'};
+const COL_MAIN   = {green:'var(--green)',   red:'var(--red)',   violet:'var(--violet)',   orange:'var(--orange)',  pink:'var(--pink)',   brown:'var(--brown)',   blue:'var(--blue)',   lblue:'var(--lblue)',   gray:'var(--gray)'  };
 const DEEP  = ['Vacuum the floor','Dust all surfaces','Clean surfaces & desk','Change bed linen & make bed','Change towel','Refill soap / toiletries'];
 const LIGHT = ['Dust all surfaces'];
 
 const F1 = [
-  {id:'f1-a1',col:1,row:1,kind:'room'},{id:'f1-a2',col:2,row:1,kind:'room'},
-  {id:'f1-b1',col:1,row:2,kind:'room'},{id:'f1-b2',col:2,row:2,kind:'room'},
+  // Top-left: one bookable room + rector office (fixed, not bookable)
+  {id:'f1-a1',col:1,row:1,kind:'room'},
+  {col:2,row:1,kind:'rector'},
+  // Bottom-left: only ONE bookable room (second cell removed)
+  {id:'f1-b1',col:1,row:2,kind:'room'},
+  {col:2,row:2,kind:'gap'},
+  // Staircase spans both rows
   {col:3,row:1,rowspan:2,kind:'stair'},
-  {id:'f1-c1',col:4,row:1,kind:'room',defaultType:'priest'},
+  // Right block top row
+  {id:'f1-c1',col:4,row:1,kind:'room'},
   {id:'f1-c2',col:5,row:1,kind:'room'},
   {id:'f1-c3',col:6,row:1,kind:'room'},
-  {id:'f1-d1',col:4,row:2,kind:'room',defaultType:'priest'},
+  // Right block bottom row
+  {id:'f1-d1',col:4,row:2,kind:'room'},
   {id:'f1-d2',col:5,row:2,kind:'room'},
   {col:6,row:2,kind:'x'},
 ];
 const F2 = [
-  {id:'f2-t1',col:1,row:1,kind:'room',defaultType:'emergency'},
+  {id:'f2-t1',col:1,row:1,kind:'room'},
   {col:2,row:1,kind:'label',label:'ART\nROOM'},
   {col:3,row:1,rowspan:2,kind:'stair'},
-  {id:'f2-t2',col:4,row:1,kind:'room',defaultType:'emergency'},
+  {id:'f2-t2',col:4,row:1,kind:'room'},
   {id:'f2-t3',col:5,row:1,kind:'room'},{id:'f2-t4',col:6,row:1,kind:'room'},
   {id:'f2-t5',col:7,row:1,kind:'room'},{id:'f2-t6',col:8,row:1,kind:'room'},
   {id:'f2-t7',col:9,row:1,kind:'room'},
@@ -334,29 +356,42 @@ onValue(ref(db,DB_KEY), snap=>{
   }
   rooms={};
   allRoomDefs().forEach(d=>{
-    const s=data[d.id]||{};
-    const def=mkDef(d);
-    rooms[d.id]={
-      ...def,
-      type:      s.type      !==undefined?s.type      :def.type,
-      roomType:  s.roomType  !==undefined?s.roomType  :def.roomType,
-      name:      s.name      !==undefined?s.name      :'',
-      owner:     s.owner     !==undefined?s.owner     :null,
-      from:      s.from      !==undefined?s.from      :'',
-      to:        s.to        !==undefined?s.to        :'',
-      notes:     s.notes     !==undefined?s.notes     :'',
-      carpet:    s.carpet    !==undefined?s.carpet    :false,
-      greenSince:s.greenSince!==undefined?s.greenSince:def.greenSince,
-      configured:s.configured!==undefined?s.configured:def.configured,
-    };
+    const s=data[d.id];
+    if(s){
+      // Room exists in Firebase — use it as-is
+      rooms[d.id]={
+        id:d.id, floor:d.floor,
+        type:       s.type       ||'',
+        roomType:   s.roomType   ||null,
+        name:       s.name       ||'',
+        owner:      s.owner      ||null,
+        from:       s.from       ||'',
+        to:         s.to         ||'',
+        notes:      s.notes      ||'',
+        carpet:     s.carpet     !==undefined ? s.carpet : true,
+        greenSince: s.greenSince ||null,
+        configured: s.configured ||false,
+      };
+    } else {
+      // New room not yet in Firebase — start blank
+      rooms[d.id]=mkDef(d);
+    }
   });
   checkTimers(); renderAll(); setSyncStatus('ok');
   if(!appReady){document.getElementById('loading').style.display='none';appReady=true;}
 },()=>setSyncStatus('err'));
 
 function mkDef(d){
-  const color=d.defaultType?(TYPE2COLOR[d.defaultType]||'green'):'';
-  return {id:d.id,floor:d.floor,type:color,roomType:d.defaultType||null,name:'',owner:null,from:'',to:'',notes:'',carpet:false,greenSince:color==='green'?Date.now():null,configured:!!d.defaultType};
+  // Every room starts completely blank — the manager configures everything
+  return {
+    id:d.id, floor:d.floor,
+    type:'', roomType:null,
+    name:'', owner:null,
+    from:'', to:'', notes:'',
+    carpet:true,
+    greenSince:null,
+    configured:false,
+  };
 }
 function saveToDB(r){
   setSyncStatus('saving');
@@ -367,8 +402,10 @@ function checkTimers(){
   const now=Date.now();
   Object.values(rooms).forEach(r=>{
     if(!r.configured)return;
+    // Green → Violet after 2 weeks unused
     if(r.type==='green'&&r.greenSince&&now-r.greenSince>=TWO_WEEKS){r.type='violet';r.greenSince=null;saveToDB(r);}
-    if(r.type==='red'&&r.to&&now>new Date(r.to+'T23:59:59').getTime()){r.type='orange';saveToDB(r);}
+    // Orange (occupied) → Red (deep clean) when end date passes
+    if(r.type==='orange'&&r.to&&now>new Date(r.to+'T23:59:59').getTime()){r.type='red';saveToDB(r);}
   });
 }
 function daysLeft(r){
@@ -394,6 +431,12 @@ function renderFloor(defs,gridEl){
       el=document.createElement('div');el.className='stair-cell';
       el.style.cssText=pl+`height:calc(var(--cell)*${rs}+var(--gap)*(${rs}-1));`;
       el.innerHTML=`<div class="stair-label">S T A I R S</div>`;
+    } else if(d.kind==='rector'){
+      el=document.createElement('div');el.className='label-cell rector-cell';el.style.cssText=pl;
+      el.innerHTML=`<span>Rector<br>Office</span>`;
+    } else if(d.kind==='gap'){
+      el=document.createElement('div');
+      el.style.cssText=pl+`width:var(--cell);height:var(--cell);`;
     } else if(d.kind==='label'){
       el=document.createElement('div');el.className='label-cell';el.style.cssText=pl;
       el.innerHTML=`<span>${(d.label||'').replace('\n','<br>')}</span>`;
@@ -418,11 +461,13 @@ function buildCell(r,pl){
   }
   el.className=`room-cell ${r.type}${r.carpet?' carpet':''}`;
   const dl=daysLeft(r);
-  const timer=(dl!==null&&dl<=7)?`<div class="timer-badge">${dl}d</div>`:'';
+  const needsRefresh=r.type==='green'&&dl!==null&&dl<=7;
+  if(needsRefresh)el.classList.add('needs-refresh');
+  const noCarpetIcon=!r.carpet?`<div class="no-carpet-icon">🚫🪵</div>`:'';
   el.innerHTML=`
-    ${timer}
+    ${noCarpetIcon}
     <div class="cell-type">${r.roomType?TYPE_LBL[r.roomType]||'':''}</div>
-    <div class="cell-name">${r.name||(r.type==='green'?'Available':'')}</div>
+    <div class="cell-name">${r.name||(r.type==='green'?'Available':r.type==='orange'?'Occupied':'')}</div>
     ${(r.from&&r.to)?`<div class="cell-dates">${fmt(r.from)} → ${fmt(r.to)}</div>`:''}
   `;
   return el;
@@ -430,14 +475,24 @@ function buildCell(r,pl){
 
 function renderStats(fid){
   const fr=Object.values(rooms).filter(r=>r.floor===fid&&r.configured&&r.type);
-  const av=fr.filter(r=>r.type==='green').length;
-  const oc=fr.filter(r=>r.type==='red').length;
-  const dc=fr.filter(r=>r.type==='orange').length;
-  const lc=fr.filter(r=>r.type==='violet').length;
-  let h=`<div class="stat-chip" style="background:var(--green-bg);border-color:var(--green);color:var(--green)">${av} available</div>`;
-  if(oc)h+=`<div class="stat-chip" style="background:var(--red-bg);border-color:var(--red);color:var(--red)">${oc} occupied</div>`;
-  if(dc)h+=`<div class="stat-chip" style="background:var(--orange-bg);border-color:var(--orange);color:var(--orange)">${dc} deep clean</div>`;
-  if(lc)h+=`<div class="stat-chip" style="background:var(--violet-bg);border-color:var(--violet);color:var(--violet)">${lc} refreshing</div>`;
+  const av  =fr.filter(r=>r.type==='green').length;
+  const occ =fr.filter(r=>r.type==='orange').length;
+  const red =fr.filter(r=>r.type==='red').length;
+  const vio =fr.filter(r=>r.type==='violet').length;
+  const pink=fr.filter(r=>r.type==='pink').length;
+  const brn =fr.filter(r=>r.type==='brown').length;
+  const bl  =fr.filter(r=>r.type==='blue').length;
+  const lbl =fr.filter(r=>r.type==='lblue').length;
+  let h='';
+  if(av)  h+=`<div class="stat-chip" style="background:var(--green-bg);border-color:var(--green);color:var(--green)">${av} available</div>`;
+  if(occ) h+=`<div class="stat-chip" style="background:var(--orange-bg);border-color:var(--orange);color:var(--orange)">${occ} occupied</div>`;
+  if(red) h+=`<div class="stat-chip" style="background:var(--red-bg);border-color:var(--red);color:var(--red)">${red} deep clean</div>`;
+  if(vio) h+=`<div class="stat-chip" style="background:var(--violet-bg);border-color:var(--violet);color:var(--violet)">${vio} refresh needed</div>`;
+  if(pink)h+=`<div class="stat-chip" style="background:var(--pink-bg);border-color:var(--pink);color:var(--pink)">${pink} priest</div>`;
+  if(brn) h+=`<div class="stat-chip" style="background:var(--brown-bg);border-color:var(--brown);color:var(--brown)">${brn} fixed</div>`;
+  if(bl)  h+=`<div class="stat-chip" style="background:var(--blue-bg);border-color:var(--blue);color:var(--blue)">${bl} itinerancy</div>`;
+  if(lbl) h+=`<div class="stat-chip" style="background:var(--lblue-bg);border-color:var(--lblue);color:var(--lblue)">${lbl} emergency</div>`;
+  if(!h)  h=`<div class="stat-chip" style="background:var(--surface2);border-color:var(--border);color:var(--text3)">No rooms configured yet</div>`;
   document.getElementById('stats-'+fid).innerHTML=h;
 }
 function renderAll(){
@@ -466,12 +521,13 @@ function mkSel(lbl,id,opts,sel){
   g.innerHTML=`<div class="form-label">${lbl}</div><select class="form-input" id="${id}">${os}</select>`;
   return g;
 }
-function mkCarpetRow(isOn){
+function mkCarpetRow(hasCarpet){
+  // Toggle is OFF = has carpet (default), ON = no carpet
+  const noCarpet = !hasCarpet;
   const row=document.createElement('div');row.className='carpet-row';
   row.innerHTML=`
-    <div class="carpet-label">Has carpet<small>Affects cleaning checklist</small></div>
-    <button type="button" class="toggle-sw${isOn?' on':''}" id="carpet-toggle"></button>`;
-  // Use setTimeout 0 so element is in DOM before we attach listener
+    <div class="carpet-label">No carpet<small>Toggle ON if this room has no carpet</small></div>
+    <button type="button" class="toggle-sw${noCarpet?' on':''}" id="carpet-toggle"></button>`;
   setTimeout(()=>{
     const btn=document.getElementById('carpet-toggle');
     if(btn) btn.addEventListener('click',()=>btn.classList.toggle('on'));
@@ -481,6 +537,7 @@ function mkCarpetRow(isOn){
 function mkCleanBox(cls,title,items){
   const box=document.createElement('div');box.className=`clean-box ${cls}`;
   box.innerHTML=`<div class="clean-box-title">${title}</div>`;
+  const total=items.length;
   items.forEach((lbl,i)=>{
     cleanCk[i]=false;
     const item=document.createElement('div');item.className='clean-item';
@@ -492,11 +549,28 @@ function mkCleanBox(cls,title,items){
       chk.classList.toggle('checked',cleanCk[i]);
       chk.textContent=cleanCk[i]?'✓':'';
       l.classList.toggle('done',cleanCk[i]);
+      // Update done button state
+      const doneBtn=document.getElementById('clean-done-btn');
+      if(doneBtn){
+        const allDone=Object.values(cleanCk).filter(v=>v).length===total;
+        doneBtn.disabled=!allDone;
+        doneBtn.style.opacity=allDone?'1':'0.45';
+        doneBtn.style.cursor=allDone?'pointer':'not-allowed';
+        doneBtn.textContent=allDone?'✓ All done — mark as available':`Complete all tasks (${Object.values(cleanCk).filter(v=>v).length}/${total})`;
+      }
     });
     box.appendChild(item);
   });
-  const btn=document.createElement('button');btn.className='clean-done-btn';btn.textContent='✓ Done — mark as available';
+  const btn=document.createElement('button');
+  btn.className='clean-done-btn';
+  btn.id='clean-done-btn';
+  btn.disabled=true;
+  btn.style.opacity='0.45';
+  btn.style.cursor='not-allowed';
+  btn.textContent=`Complete all tasks (0/${total})`;
   btn.addEventListener('click',()=>{
+    const allDone=Object.values(cleanCk).filter(v=>v).length===total;
+    if(!allDone)return;
     const r=rooms[curId];
     r.type='green';r.greenSince=Date.now();r.name=r.owner||'';r.from='';r.to='';
     saveToDB(r);renderAll();closeModal();showToast('Room cleaned & available ✓');
@@ -517,7 +591,7 @@ window.openModal=function(id){
   icon.style.color       =COL_MAIN[t]||'var(--text3)';
   icon.textContent=r.name?r.name[0].toUpperCase():'?';
   document.getElementById('modal-title').textContent=r.name||'Room';
-  document.getElementById('modal-sub').textContent=(r.roomType?TYPE_LBL[r.roomType]:'Not configured')+(r.carpet?' · 🪵 Carpet':'');
+  document.getElementById('modal-sub').textContent=(r.roomType?TYPE_LBL[r.roomType]:'Not configured')+(r.carpet?'':' · 🚫🪵 No carpet');
   document.getElementById('btn-save').textContent='Save';
 
   /* NOT CONFIGURED */
@@ -536,9 +610,34 @@ window.openModal=function(id){
   }
 
   /* DEEP CLEAN */
-  if(t==='orange'){body.appendChild(mkCleanBox('deep-clean','🧹 Deep Cleaning Required',DEEP));body.appendChild(mkNote('Tick off each task, then mark as done.'));openSheet();return;}
+  if(t==='red'){body.appendChild(mkCleanBox('deep-clean','🧹 Deep Cleaning Required',DEEP));body.appendChild(mkNote('Tick off each task to enable the "Done" button.'));openSheet();return;}
   /* LIGHT CLEAN */
-  if(t==='violet'){body.appendChild(mkCleanBox('light-clean','🪣 Light Refresh Required',LIGHT));body.appendChild(mkNote('Room has been free for 2 weeks. A light dust is needed.'));openSheet();return;}
+  if(t==='violet'){body.appendChild(mkCleanBox('light-clean','🪣 Light Refresh Required',LIGHT));body.appendChild(mkNote('Room has been free for 2 weeks. Tick the task to confirm.'));openSheet();return;}
+
+  /* GREEN WITH VIOLET DOT — needs refresh banner */
+  const dl=daysLeft(r);
+  const needsRefresh=t==='green'&&dl!==null&&dl<=7;
+  if(needsRefresh){
+    const rb=document.createElement('div');
+    rb.style.cssText='background:var(--violet-lt);border:1.5px solid var(--violet);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;';
+    rb.innerHTML=`
+      <div style="font-size:13px;color:var(--violet)">🪣 <strong>Refresh due in ${dl} day${dl!==1?'s':''}</strong><br><span style="font-size:11px;opacity:.8">Room has been free for nearly 2 weeks.</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="doRoomRefreshed()" style="font-family:inherit;font-size:13px;font-weight:700;padding:10px 16px;border-radius:9px;border:none;background:var(--violet);color:white;cursor:pointer;flex:1">✓ Room refreshed — reset timer</button>
+      </div>`;
+    body.appendChild(rb);
+  }
+
+  /* ROOM TYPE — always editable */
+  body.appendChild(mkSec('Room type'));
+  body.appendChild(mkSel('Type','m-rt',[
+    {v:'normal',    l:'Normal (guest room)'},
+    {v:'priest',    l:'Priest room'},
+    {v:'fixed',     l:'Fixed (seminarian / student)'},
+    {v:'emergency', l:'Emergency room'},
+    {v:'itinerancy',l:'Annual itinerancy'},
+    {v:'resident',  l:'Resident'},
+  ], r.roomType||'normal'));
 
   /* RESTORE (priest temp guest) */
   if(r.roomType==='priest'&&r.owner&&r.name!==r.owner){
@@ -553,7 +652,7 @@ window.openModal=function(id){
     const sr=document.createElement('div');sr.className='status-row';
     sr.innerHTML=`
       <button class="status-btn ${t==='green'?'active-green':''}" id="sbg" onclick="setSt('green')">✓ Available</button>
-      <button class="status-btn ${t==='red'?'active-red':''}"   id="sbr" onclick="setSt('red')">● Occupied</button>`;
+      <button class="status-btn ${t==='orange'?'active-orange':''}" id="sbo" onclick="setSt('orange')">● Occupied</button>`;
     body.appendChild(sr);
   }
 
@@ -568,7 +667,11 @@ window.openModal=function(id){
   fr.appendChild(mkInp('To','m-to',r.to,'date'));
   body.appendChild(fr);
   const dq=document.createElement('div');dq.className='date-shortcuts';
-  dq.innerHTML=`<button class="shortcut-btn" onclick="doFullYear()">📅 Full year</button><button class="shortcut-btn" onclick="doFromToday()">📅 From today</button>`;
+  dq.innerHTML=`
+    <button class="shortcut-btn" onclick="doFromToday()">📅 From today</button>
+    <button class="shortcut-btn" onclick="do1Night()">🌙 1 night</button>
+    <button class="shortcut-btn" onclick="do1Week()">📆 1 week</button>
+    <button class="shortcut-btn" onclick="doFullYear()">🗓 Full year</button>`;
   body.appendChild(dq);
 
   /* SETTINGS */
@@ -576,10 +679,14 @@ window.openModal=function(id){
   body.appendChild(mkCarpetRow(r.carpet));
   body.appendChild(mkInp('Notes','m-notes',r.notes,'text'));
 
-  /* RECONFIGURE */
-  const rc=document.createElement('button');rc.className='btn-reconfig';rc.textContent='⚙ Change room type';
-  rc.onclick=()=>{rooms[curId].configured=false;rooms[curId].type='';openModal(curId);};
-  body.appendChild(rc);
+  /* MANUAL CLEANING — always visible for configured rooms */
+  body.appendChild(mkSec('Manual cleaning override'));
+  const cq=document.createElement('div');cq.className='date-shortcuts';cq.style.flexWrap='wrap';
+  cq.innerHTML=`
+    <button class="shortcut-btn" style="border-color:var(--red);color:var(--red)" onclick="setManualClean('red')">🧹 Deep clean</button>
+    <button class="shortcut-btn" style="border-color:var(--violet);color:var(--violet)" onclick="setManualClean('violet')">🪣 Light refresh</button>
+    <button class="shortcut-btn" style="border-color:var(--green);color:var(--green)" onclick="setManualClean('green')">✓ Mark available</button>`;
+  body.appendChild(cq);
 
   /* TIMER */
   if(t==='green'&&r.greenSince){const dl=daysLeft(r);if(dl!==null&&dl<=10)body.appendChild(mkNote(`⏱ ${dl} day${dl!==1?'s':''} until refresh needed.`));}
@@ -592,12 +699,28 @@ function openSheet(){
   setTimeout(()=>{document.getElementById('modal-body').scrollTop=0;},15);
 }
 
+window.doRoomRefreshed=function(){
+  const r=rooms[curId];if(!r)return;
+  // Reset the green timer — dot disappears, 2 weeks start again
+  r.greenSince=Date.now();
+  saveToDB(r);renderAll();closeModal();
+  showToast('Timer reset — room refreshed ✓');
+};
+window.setManualClean=function(type){
+  const r=rooms[curId];if(!r)return;
+  r.type=type;
+  if(type==='green'){r.greenSince=Date.now();r.from='';r.to='';}
+  else{r.greenSince=null;}
+  saveToDB(r);renderAll();closeModal();
+  const labels={red:'Deep clean set 🧹',violet:'Light refresh set 🪣',green:'Marked as available ✓'};
+  showToast(labels[type]||'Updated');
+};
 window.setSt=function(s){
   const r=rooms[curId];if(!r)return;
   r.type=s;r.greenSince=s==='green'?Date.now():null;
-  const bg=document.getElementById('sbg'),br=document.getElementById('sbr');
+  const bg=document.getElementById('sbg'),bo=document.getElementById('sbo');
   if(bg)bg.className='status-btn'+(s==='green'?' active-green':'');
-  if(br)br.className='status-btn'+(s==='red'?' active-red':'');
+  if(bo)bo.className='status-btn'+(s==='orange'?' active-orange':'');
 };
 window.doRestore=function(){
   const r=rooms[curId];if(!r||!r.owner)return;
@@ -610,11 +733,24 @@ window.doFullYear=function(){
   if(fi)fi.value=f;if(ti)ti.value=yearFrom(f);
 };
 window.doFromToday=function(){const fi=document.getElementById('m-from');if(fi)fi.value=today();};
+window.do1Night=function(){
+  const f=today();
+  const d=new Date(f+'T12:00:00');d.setDate(d.getDate()+1);
+  const fi=document.getElementById('m-from'),ti=document.getElementById('m-to');
+  if(fi)fi.value=f;if(ti)ti.value=d.toISOString().split('T')[0];
+};
+window.do1Week=function(){
+  const f=today();
+  const d=new Date(f+'T12:00:00');d.setDate(d.getDate()+7);
+  const fi=document.getElementById('m-from'),ti=document.getElementById('m-to');
+  if(fi)fi.value=f;if(ti)ti.value=d.toISOString().split('T')[0];
+};
 
 window.saveRoom=function(){
   const r=rooms[curId];if(!r)return;
   const gv=id=>{const el=document.getElementById(id);return el?el.value.trim():'';}
-  const gc=()=>{const el=document.getElementById('carpet-toggle');return el?el.classList.contains('on'):false;}
+  // toggle ON means "no carpet", so carpet = toggle is NOT on
+  const gc=()=>{const el=document.getElementById('carpet-toggle');return el?!el.classList.contains('on'):true;}
 
   if(!r.configured||!r.type){
     const rt=document.getElementById('m-rt');
@@ -627,13 +763,28 @@ window.saveRoom=function(){
     saveToDB(r);renderAll();closeModal();showToast('Room configured ✓');return;
   }
   const prev=r.type;
+  // Read room type from dropdown (always visible now)
+  const rt=document.getElementById('m-rt');
+  if(rt && rt.value !== r.roomType){
+    const oldType=r.roomType;
+    r.roomType=rt.value;
+    // Update owner if switching to/from priest
+    if(r.roomType==='priest'&&r.name) r.owner=r.name;
+    else if(oldType==='priest') r.owner=null;
+    // Update base color only if room is not in a special state
+    if(prev==='green'||prev==='pink'||prev==='brown'||prev==='blue'||prev==='lblue'||prev==='gray'){
+      r.type=TYPE2COLOR[r.roomType]||'green';
+      if(r.type==='green') r.greenSince=Date.now();
+    }
+  }
   r.name=gv('m-name');
   const mf=document.getElementById('m-from'),mt=document.getElementById('m-to');
   if(mf)r.from=mf.value;if(mt)r.to=mt.value;
   r.carpet=gc();r.notes=gv('m-notes');
 
-  if(prev==='red'&&r.type==='green'){
-    r.type='orange';r.greenSince=null;r.name=r.owner||'';r.from='';r.to='';
+  // If guest left (orange → available) → trigger deep clean (red)
+  if(prev==='orange'&&r.type==='green'){
+    r.type='red';r.greenSince=null;r.name=r.owner||'';r.from='';r.to='';
     saveToDB(r);renderAll();closeModal();showToast('Room freed — deep clean needed 🧹');return;
   }
   saveToDB(r);renderAll();closeModal();showToast('Saved ✓');
@@ -654,6 +805,17 @@ document.getElementById('date-chip').textContent=
   new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
 document.getElementById('modal-overlay').addEventListener('click',e=>{
   if(e.target===document.getElementById('modal-overlay'))closeModal();
+});
+document.addEventListener('keydown',e=>{
+  const overlayOpen=document.getElementById('modal-overlay').classList.contains('open');
+  if(!overlayOpen)return;
+  if(e.key==='Escape'){closeModal();return;}
+  if(e.key==='Enter'){
+    // Don't save if we're in cleaning mode (done button handles it)
+    const cleanBtn=document.getElementById('clean-done-btn');
+    if(cleanBtn)return; // cleaning modal — Enter does nothing, user must tick all items
+    e.preventDefault();saveRoom();
+  }
 });
 setSyncStatus('saving');
 setInterval(()=>{checkTimers();renderAll();},30*60*1000);
