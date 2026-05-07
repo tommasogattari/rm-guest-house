@@ -1,663 +1,576 @@
-<!DOCTYPE html>
+import { useState, useEffect } from “react”;
 
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>RM Guest House</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#F2EFE9;--surface:#FFFFFF;--surface2:#E8E4DA;
-  --text:#1A1814;--text2:#6A6560;--text3:#AAA59F;--border:#D5D0C6;
-  --green:#27743F;--green-bg:#C8E6D4;--green-lt:#EDF7F1;
-  --red:#A82828;  --red-bg:#F5CECE;  --red-lt:#FBF0F0;
-  --violet:#5A3490;--violet-bg:#DDD0F5;--violet-lt:#F0EBFB;
-  --orange:#B85810;--orange-bg:#F5DEC0;--orange-lt:#FDF3E8;
-  --pink:#B04068; --pink-bg:#F5D0E0; --pink-lt:#FBF0F5;
-  --brown:#7A5428;--brown-bg:#E8D4B0;--brown-lt:#F5EEE3;
-  --blue:#245C9A; --blue-bg:#C8DCEF; --blue-lt:#EBF3FB;
-  --gray:#555050; --gray-bg:#DDDAD5; --gray-lt:#F0EEEB;
-  --cell:92px;--gap:8px;
+const C = {
+bg:”#F2EFE9”, surface:”#FFFFFF”, surface2:”#E8E4DA”,
+text:”#1A1814”, text2:”#6A6560”, text3:”#AAA59F”, border:”#D5D0C6”,
+green:”#27743F”,  greenBg:”#C8E6D4”, greenLt:”#EDF7F1”,
+red:”#A82828”,    redBg:”#F5CECE”,   redLt:”#FBF0F0”,
+violet:”#5A3490”, violetBg:”#DDD0F5”,violetLt:”#F0EBFB”,
+orange:”#B85810”, orangeBg:”#F5DEC0”,orangeLt:”#FDF3E8”,
+pink:”#B04068”,   pinkBg:”#F5D0E0”,  pinkLt:”#FBF0F5”,
+brown:”#7A5428”,  brownBg:”#E8D4B0”, brownLt:”#F5EEE3”,
+blue:”#245C9A”,   blueBg:”#C8DCEF”,  blueLt:”#EBF3FB”,
+lblue:”#1A7AAA”,  lblueBg:”#BEE3F5”, lblueLt:”#E8F6FD”,
+gray:”#555050”,   grayBg:”#DDDAD5”,  grayLt:”#F0EEEB”,
+};
+
+const colorMap = {
+green:  { lt:C.greenLt,  border:C.green,  label:C.green,  bg:C.greenBg  },
+red:    { lt:C.redLt,    border:C.red,    label:C.red,    bg:C.redBg    },
+violet: { lt:C.violetLt, border:C.violet, label:C.violet, bg:C.violetBg },
+orange: { lt:C.orangeLt, border:C.orange, label:C.orange, bg:C.orangeBg },
+pink:   { lt:C.pinkLt,   border:C.pink,   label:C.pink,   bg:C.pinkBg   },
+brown:  { lt:C.brownLt,  border:C.brown,  label:C.brown,  bg:C.brownBg  },
+blue:   { lt:C.blueLt,   border:C.blue,   label:C.blue,   bg:C.blueBg   },
+lblue:  { lt:C.lblueLt,  border:C.lblue,  label:C.lblue,  bg:C.lblueBg  },
+gray:   { lt:C.grayLt,   border:C.gray,   label:C.gray,   bg:C.grayBg   },
+};
+
+const TYPE_LBL = {
+normal:“Normal”, priest:“Priest”, fixed:“Fixed”,
+emergency:“Emergency”, itinerancy:“Itinerancy”, resident:“Resident”
+};
+
+const DEEP_ITEMS = [
+“Vacuum the floor”,“Dust all surfaces”,“Clean surfaces & desk”,
+“Change bed linen & make bed”,“Change towel”,“Refill soap / toiletries”
+];
+const LIGHT_ITEMS = [“Dust all surfaces”];
+
+// ── DEMO DATA ──────────────────────────────────────────────
+const INIT_ROOMS = {
+// FIRST FLOOR
+“f1-a1”:{ id:“f1-a1”, floor:“f1”, roomType:“normal”,     type:“green”,  name:””,          carpet:false, from:””, to:””, notes:””, configured:true  },
+“f1-a2”:{ id:“f1-a2”, floor:“f1”, roomType:“normal”,     type:“orange”, name:“Marco R.”,   carpet:true,  from:“2026-05-01”, to:“2026-05-20”, notes:””, configured:true },
+“f1-b1”:{ id:“f1-b1”, floor:“f1”, roomType:“normal”,     type:“violet”, name:””,          carpet:false, from:””, to:””, notes:””, configured:true  },
+“f1-b2”:{ id:“f1-b2”, floor:“f1”, roomType:“normal”,     type:“green”,  name:””,          carpet:true,  from:””, to:””, notes:“needs-refresh”, configured:true, greenSince: Date.now()-11*86400000 },
+“f1-c1”:{ id:“f1-c1”, floor:“f1”, roomType:“priest”,     type:“pink”,   name:“Fr. Mario”,  owner:“Fr. Mario”, carpet:false, from:””, to:””, notes:””, configured:true },
+“f1-c2”:{ id:“f1-c2”, floor:“f1”, roomType:“normal”,     type:“red”,    name:””,          carpet:false, from:””, to:””, notes:””, configured:true  },
+“f1-c3”:{ id:“f1-c3”, floor:“f1”, roomType:“normal”,     type:””,       name:””,          carpet:false, from:””, to:””, notes:””, configured:false },
+“f1-d1”:{ id:“f1-d1”, floor:“f1”, roomType:“priest”,     type:“pink”,   name:“Fr. Luigi”,  owner:“Fr. Luigi”, carpet:false, from:””, to:””, notes:””, configured:true },
+“f1-d2”:{ id:“f1-d2”, floor:“f1”, roomType:“itinerancy”, type:“blue”,   name:“P. Giovanni”,carpet:false, from:“2026-01-01”, to:“2026-12-31”, notes:””, configured:true },
+// SECOND FLOOR
+“f2-t1”:{ id:“f2-t1”, floor:“f2”, roomType:“emergency”,  type:“lblue”,  name:””,          carpet:false, from:””, to:””, notes:””, configured:true  },
+“f2-t2”:{ id:“f2-t2”, floor:“f2”, roomType:“emergency”,  type:“lblue”,  name:””,          carpet:false, from:””, to:””, notes:””, configured:true  },
+“f2-t3”:{ id:“f2-t3”, floor:“f2”, roomType:“normal”,     type:“green”,  name:””,          carpet:true,  from:””, to:””, notes:””, configured:true  },
+“f2-t4”:{ id:“f2-t4”, floor:“f2”, roomType:“normal”,     type:“orange”, name:“Luca B.”,    carpet:false, from:“2026-05-05”, to:“2026-05-15”, notes:””, configured:true },
+“f2-t5”:{ id:“f2-t5”, floor:“f2”, roomType:“normal”,     type:“green”,  name:””,          carpet:false, from:””, to:””, notes:””, configured:true  },
+“f2-t6”:{ id:“f2-t6”, floor:“f2”, roomType:“normal”,     type:””,       name:””,          carpet:false, from:””, to:””, notes:””, configured:false },
+“f2-t7”:{ id:“f2-t7”, floor:“f2”, roomType:“normal”,     type:“violet”, name:””,          carpet:true,  from:””, to:””, notes:””, configured:true  },
+“f2-b1”:{ id:“f2-b1”, floor:“f2”, roomType:“fixed”,      type:“brown”,  name:“Sem. Paolo”, carpet:false, from:“2025-09-01”, to:“2026-06-30”, notes:””, configured:true },
+“f2-b2”:{ id:“f2-b2”, floor:“f2”, roomType:“fixed”,      type:“brown”,  name:“Sem. Carlo”, carpet:false, from:“2025-09-01”, to:“2026-06-30”, notes:””, configured:true },
+“f2-b3”:{ id:“f2-b3”, floor:“f2”, roomType:“fixed”,      type:“brown”,  name:“Sem. Luca”,  carpet:true,  from:“2025-09-01”, to:“2026-06-30”, notes:””, configured:true },
+“f2-b4”:{ id:“f2-b4”, floor:“f2”, roomType:“normal”,     type:“green”,  name:””,          carpet:false, from:””, to:””, notes:””, configured:true  },
+“f2-b5”:{ id:“f2-b5”, floor:“f2”, roomType:“normal”,     type:“red”,    name:””,          carpet:false, from:””, to:””, notes:””, configured:true  },
+“f2-b6”:{ id:“f2-b6”, floor:“f2”, roomType:“normal”,     type:””,       name:””,          carpet:false, from:””, to:””, notes:””, configured:false },
+“f2-b7”:{ id:“f2-b7”, floor:“f2”, roomType:“normal”,     type:””,       name:””,          carpet:false, from:””, to:””, notes:””, configured:false },
+“f2-b8”:{ id:“f2-b8”, floor:“f2”, roomType:“normal”,     type:“green”,  name:””,          carpet:true,  from:””, to:””, notes:””, configured:true  },
+“f2-b9”:{ id:“f2-b9”, floor:“f2”, roomType:“normal”,     type:””,       name:””,          carpet:false, from:””, to:””, notes:””, configured:false },
+“f2-b10”:{ id:“f2-b10”,floor:“f2”, roomType:“fixed”,     type:“brown”,  name:“Stud. Anna”, carpet:false, from:“2025-10-01”, to:“2026-07-31”, notes:””, configured:true },
+};
+
+const F1_LAYOUT = [
+{id:“f1-a1”,col:1,row:1},{id:“f1-a2”,col:2,row:1},
+{id:“f1-b1”,col:1,row:2},{id:“f1-b2”,col:2,row:2},
+{kind:“stair”,col:3,row:1,rowspan:2},
+{id:“f1-c1”,col:4,row:1},{id:“f1-c2”,col:5,row:1},{id:“f1-c3”,col:6,row:1},
+{id:“f1-d1”,col:4,row:2},{id:“f1-d2”,col:5,row:2},
+{kind:“x”,col:6,row:2},
+];
+
+const F2_LAYOUT = [
+{id:“f2-t1”,col:1,row:1},{kind:“label”,label:“ART\nROOM”,col:2,row:1},
+{kind:“stair”,col:3,row:1,rowspan:2},
+{id:“f2-t2”,col:4,row:1},{id:“f2-t3”,col:5,row:1},{id:“f2-t4”,col:6,row:1},
+{id:“f2-t5”,col:7,row:1},{id:“f2-t6”,col:8,row:1},{id:“f2-t7”,col:9,row:1},
+{kind:“label”,label:“WC”,col:10,row:1},{kind:“stair”,col:11,row:1},
+{id:“f2-b1”,col:1,row:2},{id:“f2-b2”,col:2,row:2},
+{id:“f2-b3”,col:4,row:2},{id:“f2-b4”,col:5,row:2},{id:“f2-b5”,col:6,row:2},
+{id:“f2-b6”,col:7,row:2},{id:“f2-b7”,col:8,row:2},{id:“f2-b8”,col:9,row:2},
+{id:“f2-b9”,col:10,row:2},{id:“f2-b10”,col:11,row:2},
+];
+
+const CELL = 84;
+const GAP  = 8;
+
+// ── COMPONENTS ─────────────────────────────────────────────
+
+function RoomCell({ r, onClick }) {
+if (!r) return null;
+const needsRefresh = r.type===“green” && r.notes===“needs-refresh”;
+
+if (!r.configured || !r.type) {
+return (
+<div onClick={onClick} style={{
+width:CELL, height:CELL, borderRadius:10,
+border:“2.5px dashed #B0A898”, background:”#E8E4DA”,
+cursor:“pointer”, display:“flex”, alignItems:“flex-end”,
+padding:“6px 7px 8px”, boxSizing:“border-box”,
+}}>
+<div style={{fontSize:9,color:C.text3,fontStyle:“italic”,lineHeight:1.3}}>Tap to<br/>configure</div>
+</div>
+);
 }
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:50px}
 
-/* LOADING */
-#loading{position:fixed;inset:0;background:var(–bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:9999}
-#loading h1{font-family:‘DM Serif Display’,serif;font-size:26px}
-#loading h1 span{color:var(–brown)}
-.spinner{width:28px;height:28px;border:3px solid var(–border);border-top-color:var(–brown);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+const col = colorMap[r.type] || colorMap.gray;
+const fmt = s => s ? new Date(s+“T12:00:00”).toLocaleDateString(“en-GB”,{day:“2-digit”,month:“2-digit”}) : “”;
 
-/* HEADER */
-header{position:sticky;top:0;z-index:500;background:#FFFFFF;border-bottom:1px solid var(–border);padding:0 18px;height:56px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 6px rgba(0,0,0,.07)}
-.h-logo{font-family:‘DM Serif Display’,serif;font-size:18px}
-.h-logo span{color:var(–brown)}
-.h-right{display:flex;align-items:center;gap:10px}
-.sync-dot{width:8px;height:8px;border-radius:50%;background:var(–text3);transition:background .3s}
-.sync-dot.ok{background:var(–green)}.sync-dot.saving{background:var(–orange);animation:blink .8s infinite}.sync-dot.err{background:var(–red)}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.date-chip{font-size:11px;color:var(–text2);background:var(–surface2);padding:5px 12px;border-radius:20px;border:1px solid var(–border)}
-
-/* TABS */
-.tabs{position:sticky;top:56px;z-index:499;background:#FFFFFF;border-bottom:2px solid var(–border);display:flex}
-.tab-btn{flex:1;border:none;cursor:pointer;font-family:‘DM Sans’,sans-serif;font-size:13px;font-weight:600;height:48px;padding:0 4px;color:var(–text3);background:#FFFFFF;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s}
-.tab-btn.active{color:var(–brown);border-bottom:3px solid var(–brown);font-weight:700;text-decoration:underline;text-underline-offset:4px}
-
-/* PAGES */
-.page{display:none;padding:18px 14px}
-.page.active{display:block}
-
-/* STATS */
-.statsbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
-.stat-chip{font-size:10px;font-weight:700;letter-spacing:.3px;padding:4px 12px;border-radius:20px;border:1.5px solid}
-
-/* LEGEND */
-.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:18px}
-.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(–text2)}
-.leg-dot{width:13px;height:13px;border-radius:4px;border:2px solid;flex-shrink:0}
-
-/* PLAN */
-.plan-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.plan-grid{display:inline-grid;gap:var(–gap);padding-bottom:6px}
-
-/* ROOM CELL */
-.room-cell{width:var(–cell);height:var(–cell);border-radius:10px;border:2.5px solid;cursor:pointer;position:relative;display:flex;flex-direction:column;justify-content:flex-end;padding:6px 7px 8px;overflow:hidden;transition:transform .1s;-webkit-user-select:none;user-select:none}
-.room-cell:active{transform:scale(.93)}
-.room-cell.green  {background:var(–green-lt); border-color:var(–green)}
-.room-cell.red    {background:var(–red-lt);   border-color:var(–red)}
-.room-cell.violet {background:var(–violet-lt);border-color:var(–violet)}
-.room-cell.orange {background:var(–orange-lt);border-color:var(–orange)}
-.room-cell.pink   {background:var(–pink-lt);  border-color:var(–pink)}
-.room-cell.brown  {background:var(–brown-lt); border-color:var(–brown)}
-.room-cell.blue   {background:var(–blue-lt);  border-color:var(–blue)}
-.room-cell.gray   {background:var(–gray-lt);  border-color:var(–gray)}
-.room-cell.empty  {background:#E8E4DA;border:2.5px dashed #B0A898}
-.room-cell.excluded{background:var(–bg);border:2px dashed #CCC;cursor:default}
-.room-cell.excluded::before,.room-cell.excluded::after{content:’’;position:absolute;background:#CCC;width:130%;height:2px;top:50%;left:-15%}
-.room-cell.excluded::before{transform:rotate(30deg)}.room-cell.excluded::after{transform:rotate(-30deg)}
-/* carpet stripe at bottom */
-.room-cell.carpet::after{content:’’;position:absolute;bottom:0;left:0;right:0;height:5px;border-radius:0 0 8px 8px;opacity:.5}
-.room-cell.green.carpet::after  {background:var(–green)}
-.room-cell.red.carpet::after    {background:var(–red)}
-.room-cell.violet.carpet::after {background:var(–violet)}
-.room-cell.orange.carpet::after {background:var(–orange)}
-.room-cell.pink.carpet::after   {background:var(–pink)}
-.room-cell.brown.carpet::after  {background:var(–brown)}
-.room-cell.blue.carpet::after   {background:var(–blue)}
-.room-cell.gray.carpet::after   {background:var(–gray)}
-.room-cell.empty.carpet::after  {background:#B0A898}
-/* cell text */
-.cell-type{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;opacity:.7;line-height:1;margin-bottom:2px}
-.cell-name{font-size:11px;font-weight:600;color:var(–text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
-.cell-dates{font-size:9px;color:var(–text3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cell-hint{font-size:9px;color:var(–text3);font-style:italic;line-height:1.3}
-.room-cell.green .cell-type  {color:var(–green)}
-.room-cell.red .cell-type    {color:var(–red)}
-.room-cell.violet .cell-type {color:var(–violet)}
-.room-cell.orange .cell-type {color:var(–orange)}
-.room-cell.pink .cell-type   {color:var(–pink)}
-.room-cell.brown .cell-type  {color:var(–brown)}
-.room-cell.blue .cell-type   {color:var(–blue)}
-.room-cell.gray .cell-type   {color:var(–gray)}
-.timer-badge{position:absolute;top:5px;right:5px;font-size:8px;font-weight:700;background:#FFFFFF;color:var(–violet);border:1px solid var(–violet);padding:2px 4px;border-radius:4px}
-
-/* STAIR / LABEL */
-.stair-cell{width:var(–cell);border-radius:10px;border:2px solid var(–border);background:var(–surface2);display:flex;align-items:center;justify-content:center}
-.stair-label{font-size:9px;font-weight:700;letter-spacing:3px;color:var(–text3);writing-mode:vertical-rl}
-.label-cell{width:var(–cell);height:var(–cell);border-radius:10px;border:2px solid var(–border);background:var(–surface2);display:flex;align-items:center;justify-content:center;text-align:center;padding:6px}
-.label-cell span{font-size:10px;font-weight:700;color:var(–text2);line-height:1.4;letter-spacing:.3px}
-
-/* ===================== MODAL ===================== */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;align-items:flex-end;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal-sheet{
-background:#FFFFFF;
-width:100%;max-width:520px;
-border-radius:22px 22px 0 0;
-max-height:90vh;
-display:flex;flex-direction:column;
-box-shadow:0 -4px 32px rgba(0,0,0,.22);
-animation:slideUp .22s cubic-bezier(.3,1,.5,1);
+return (
+<div onClick={onClick} style={{
+width:CELL, height:CELL, borderRadius:10,
+border:`2.5px solid ${col.border}`,
+background:col.lt,
+cursor:“pointer”, display:“flex”, flexDirection:“column”,
+justifyContent:“flex-end”, padding:“6px 7px 8px”,
+boxSizing:“border-box”, position:“relative”, overflow:“hidden”,
+}}>
+{/* violet dot for approaching refresh */}
+{needsRefresh && (
+<div style={{
+position:“absolute”,top:6,left:6,width:9,height:9,
+borderRadius:“50%”,background:C.violet,border:“1.5px solid white”,zIndex:1
+}}/>
+)}
+{/* carpet stripe */}
+{r.carpet && (
+<div style={{
+position:“absolute”,bottom:0,left:0,right:0,height:5,
+borderRadius:“0 0 8px 8px”,background:col.border,opacity:.45
+}}/>
+)}
+<div style={{fontSize:9,fontWeight:700,letterSpacing:.5,textTransform:“uppercase”,opacity:.7,color:col.label,lineHeight:1,marginBottom:2}}>
+{r.roomType ? TYPE_LBL[r.roomType]||”” : “”}
+</div>
+<div style={{fontSize:11,fontWeight:600,color:C.text,whiteSpace:“nowrap”,overflow:“hidden”,textOverflow:“ellipsis”,lineHeight:1.3}}>
+{r.name || (r.type===“green”?“Available”:r.type===“orange”?“Occupied”:””)}
+</div>
+{r.from && r.to && (
+<div style={{fontSize:9,color:C.text3,marginTop:1,whiteSpace:“nowrap”,overflow:“hidden”,textOverflow:“ellipsis”}}>
+{fmt(r.from)} → {fmt(r.to)}
+</div>
+)}
+</div>
+);
 }
-@media(min-width:540px){.modal-overlay{align-items:center}.modal-sheet{border-radius:22px;max-height:86vh}}
-@keyframes slideUp{from{transform:translateY(50px);opacity:0}to{transform:translateY(0);opacity:1}}
-.modal-handle{width:36px;height:4px;background:var(–border);border-radius:2px;margin:12px auto 0;flex-shrink:0}
-@media(min-width:540px){.modal-handle{display:none}}
-.modal-header{padding:16px 20px 14px;border-bottom:1px solid var(–border);display:flex;align-items:center;gap:14px;flex-shrink:0;background:#FFFFFF;border-radius:22px 22px 0 0}
-.modal-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:2px solid}
-.modal-title{font-family:‘DM Serif Display’,serif;font-size:19px;color:var(–text)}
-.modal-sub{font-size:12px;color:var(–text2);margin-top:3px}
-.modal-body{padding:18px 20px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;-webkit-overflow-scrolling:touch}
-.modal-footer{padding:12px 20px;padding-bottom:max(12px,env(safe-area-inset-bottom));border-top:1px solid var(–border);display:flex;gap:10px;flex-shrink:0;background:#FFFFFF}
 
-/* FORM */
-.form-group{display:flex;flex-direction:column;gap:6px}
-.form-label{font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(–text2)}
-.form-input{background:var(–bg);border:1.5px solid var(–border);border-radius:10px;padding:12px 14px;font-family:‘DM Sans’,sans-serif;font-size:15px;color:var(–text);outline:none;width:100%;-webkit-appearance:none;appearance:none;transition:border-color .15s}
-.form-input:focus{border-color:var(–brown);background:#FFFFFF}
-select.form-input{cursor:pointer}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.date-shortcuts{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
-.shortcut-btn{font-family:‘DM Sans’,sans-serif;font-size:11px;font-weight:600;padding:7px 13px;border-radius:8px;border:1.5px solid var(–border);background:var(–surface2);color:var(–text2);cursor:pointer}
-.shortcut-btn:active{background:var(–border)}
-.form-section{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(–text3);padding-bottom:6px;border-bottom:1.5px solid var(–border)}
-
-/* CARPET TOGGLE */
-.carpet-row{display:flex;align-items:center;justify-content:space-between;background:var(–surface2);border-radius:12px;padding:14px 16px;border:1.5px solid var(–border)}
-.carpet-label{font-size:15px;font-weight:500;color:var(–text)}
-.carpet-label small{display:block;font-size:11px;color:var(–text2);margin-top:2px;font-weight:400}
-.toggle-sw{width:52px;height:30px;border-radius:15px;background:var(–border);position:relative;cursor:pointer;border:none;outline:none;flex-shrink:0;transition:background .22s;-webkit-appearance:none;appearance:none}
-.toggle-sw.on{background:var(–green)}
-.toggle-sw::after{content:’’;position:absolute;width:24px;height:24px;border-radius:50%;background:#FFFFFF;top:3px;left:3px;transition:transform .22s;box-shadow:0 1px 4px rgba(0,0,0,.25)}
-.toggle-sw.on::after{transform:translateX(22px)}
-
-/* STATUS BUTTONS */
-.status-row{display:flex;gap:8px}
-.status-btn{flex:1;font-family:‘DM Sans’,sans-serif;font-size:13px;font-weight:600;padding:12px 10px;border-radius:10px;text-align:center;border:2px solid var(–border);background:#FFFFFF;color:var(–text2);cursor:pointer;transition:all .15s}
-.status-btn.active-green{background:var(–green-bg);color:var(–green);border-color:var(–green)}
-.status-btn.active-red  {background:var(–red-bg);  color:var(–red);  border-color:var(–red)}
-
-/* RESTORE */
-.restore-box{background:var(–pink-lt);border:1.5px solid var(–pink);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.restore-lbl{font-size:13px;color:var(–pink)}
-.restore-lbl strong{font-weight:700}
-.restore-btn{font-family:‘DM Sans’,sans-serif;font-size:12px;font-weight:700;padding:8px 14px;border-radius:9px;border:none;background:var(–pink);color:#FFFFFF;cursor:pointer;white-space:nowrap}
-
-/* CLEANING */
-.clean-box{border-radius:12px;border:2px solid;padding:14px}
-.clean-box.deep-clean {border-color:var(–orange);background:var(–orange-lt)}
-.clean-box.light-clean{border-color:var(–violet);background:var(–violet-lt)}
-.clean-box-title{font-size:13px;font-weight:700;margin-bottom:12px}
-.clean-box.deep-clean  .clean-box-title{color:var(–orange)}
-.clean-box.light-clean .clean-box-title{color:var(–violet)}
-.clean-item{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,.07);cursor:pointer}
-.clean-item:last-of-type{border-bottom:none;padding-bottom:0}
-.clean-cb{width:24px;height:24px;border-radius:7px;border:2px solid;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:#FFFFFF;background:#FFFFFF;transition:all .15s}
-.clean-box.deep-clean  .clean-cb{border-color:var(–orange)}
-.clean-box.light-clean .clean-cb{border-color:var(–violet)}
-.clean-cb.checked{color:#FFFFFF}
-.clean-box.deep-clean  .clean-cb.checked{background:var(–orange);border-color:var(–orange)}
-.clean-box.light-clean .clean-cb.checked{background:var(–violet);border-color:var(–violet)}
-.clean-item-lbl{font-size:14px;color:var(–text)}
-.clean-item-lbl.done{text-decoration:line-through;color:var(–text3)}
-.clean-done-btn{width:100%;margin-top:14px;font-family:‘DM Sans’,sans-serif;font-size:13px;font-weight:700;padding:12px;border-radius:10px;border:none;color:#FFFFFF;cursor:pointer}
-.clean-box.deep-clean  .clean-done-btn{background:var(–orange)}
-.clean-box.light-clean .clean-done-btn{background:var(–violet)}
-
-.info-note{font-size:12px;color:var(–text2);background:var(–surface2);border-radius:10px;padding:10px 14px;border:1px solid var(–border);line-height:1.6}
-
-/* BUTTONS */
-.btn-cancel{font-family:‘DM Sans’,sans-serif;font-size:14px;font-weight:500;padding:12px 18px;border-radius:11px;border:1.5px solid var(–border);background:#FFFFFF;color:var(–text2);cursor:pointer}
-.btn-save{flex:1;font-family:‘DM Sans’,sans-serif;font-size:14px;font-weight:700;padding:12px;border-radius:11px;border:none;background:var(–text);color:#FFFFFF;cursor:pointer}
-.btn-save:active{background:#2a2820}
-.btn-reconfig{font-family:‘DM Sans’,sans-serif;font-size:12px;font-weight:600;padding:10px 14px;border-radius:10px;border:1.5px solid var(–border);background:#FFFFFF;color:var(–text2);cursor:pointer;margin-top:4px}
-
-/* TOAST */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);background:var(–text);color:#FFFFFF;padding:10px 22px;border-radius:24px;font-size:13px;font-weight:600;box-shadow:0 4px 18px rgba(0,0,0,.22);z-index:9000;opacity:0;transition:transform .22s,opacity .22s;white-space:nowrap}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-</style>
-
-</head>
-<body>
-
-<div id="loading"><h1>RM <span>Guest House</span></h1><div class="spinner"></div></div>
-
-<header>
-  <div class="h-logo">RM <span>Guest House</span></div>
-  <div class="h-right">
-    <div class="sync-dot" id="sync-dot"></div>
-    <div class="date-chip" id="date-chip"></div>
-  </div>
-</header>
-
-<div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('f1')">1st Floor</button>
-  <button class="tab-btn"        onclick="switchTab('f2')">2nd Floor</button>
-  <button class="tab-btn"        onclick="switchTab('si')">Sisters</button>
+function Stair({ rowspan=1 }) {
+return (
+<div style={{
+width:CELL, height:CELL*rowspan+GAP*(rowspan-1),
+borderRadius:10, border:`2px solid ${C.border}`,
+background:C.surface2, display:“flex”, alignItems:“center”, justifyContent:“center”,
+}}>
+<div style={{fontSize:9,fontWeight:700,letterSpacing:3,color:C.text3,writingMode:“vertical-rl”}}>
+S T A I R S
 </div>
-
-<div class="page active" id="page-f1">
-  <div class="statsbar" id="stats-f1"></div>
-  <div class="legend">
-    <div class="leg-item"><div class="leg-dot" style="background:var(--green-lt);border-color:var(--green)"></div>Available</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--red-lt);border-color:var(--red)"></div>Occupied</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--orange-lt);border-color:var(--orange)"></div>Deep clean</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--violet-lt);border-color:var(--violet)"></div>Refreshing</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--pink-lt);border-color:var(--pink)"></div>Priest</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--blue-lt);border-color:var(--blue)"></div>Emergency</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--brown-lt);border-color:var(--brown)"></div>Fixed</div>
-  </div>
-  <div class="plan-scroll"><div class="plan-grid" id="grid-f1"></div></div>
 </div>
+);
+}
 
-<div class="page" id="page-f2">
-  <div class="statsbar" id="stats-f2"></div>
-  <div class="plan-scroll"><div class="plan-grid" id="grid-f2"></div></div>
+function LabelCell({ label }) {
+return (
+<div style={{
+width:CELL, height:CELL, borderRadius:10,
+border:`2px solid ${C.border}`, background:C.surface2,
+display:“flex”, alignItems:“center”, justifyContent:“center”,
+textAlign:“center”, padding:6,
+}}>
+<span style={{fontSize:10,fontWeight:700,color:C.text2,lineHeight:1.4}}>
+{label.split(”\n”).map((l,i)=><span key={i}>{l}{i<label.split(”\n”).length-1&&<br/>}</span>)}
+</span>
 </div>
+);
+}
 
-<div class="page" id="page-si">
-  <div style="text-align:center;padding:70px 20px">
-    <div style="font-size:48px;margin-bottom:14px">🏠</div>
-    <div style="font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:10px">Sisters Floor</div>
-    <div style="font-size:13px;color:var(--text2);line-height:1.7;max-width:260px;margin:0 auto">Send the floor plan and we'll build this section!</div>
-  </div>
+function ExcludedCell() {
+return (
+<div style={{
+width:CELL,height:CELL,borderRadius:10,
+border:“2px dashed #CCC”,background:C.bg,
+position:“relative”,overflow:“hidden”,
+}}>
+<div style={{position:“absolute”,background:”#CCC”,width:“130%”,height:2,top:“50%”,left:”-15%”,transform:“rotate(30deg)”}}/>
+<div style={{position:“absolute”,background:”#CCC”,width:“130%”,height:2,top:“50%”,left:”-15%”,transform:“rotate(-30deg)”}}/>
 </div>
+);
+}
 
-<div class="modal-overlay" id="modal-overlay">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-header">
-      <div class="modal-icon" id="modal-icon"></div>
+function FloorPlan({ layout, rooms, onCellClick }) {
+const maxCol = Math.max(…layout.map(d => d.col + (d.colspan||1) - 1));
+const maxRow = Math.max(…layout.map(d => d.row + (d.rowspan||1) - 1));
+
+// Build grid cells
+const cells = layout.map((d, i) => {
+const style = {
+gridColumn: `${d.col} / span ${d.colspan||1}`,
+gridRow:    `${d.row} / span ${d.rowspan||1}`,
+};
+if (d.kind===“stair”)  return <div key={i} style={style}><Stair rowspan={d.rowspan||1}/></div>;
+if (d.kind===“label”)  return <div key={i} style={style}><LabelCell label={d.label}/></div>;
+if (d.kind===“x”)      return <div key={i} style={style}><ExcludedCell/></div>;
+const r = rooms[d.id];
+return <div key={i} style={style}><RoomCell r={r} onClick={()=>onCellClick(d.id)}/></div>;
+});
+
+return (
+<div style={{overflowX:“auto”,WebkitOverflowScrolling:“touch”}}>
+<div style={{
+display:“inline-grid”,
+gridTemplateColumns:`repeat(${maxCol}, ${CELL}px)`,
+gridTemplateRows:`repeat(${maxRow}, ${CELL}px)`,
+gap:GAP, paddingBottom:6,
+}}>
+{cells}
+</div>
+</div>
+);
+}
+
+function StatsBar({ rooms, floor }) {
+const fr = Object.values(rooms).filter(r=>r.floor===floor&&r.configured&&r.type);
+const counts = {};
+fr.forEach(r=>{ counts[r.type]=(counts[r.type]||0)+1; });
+const chips = [
+{type:“green”,  label:“available”, col:colorMap.green},
+{type:“orange”, label:“occupied”,  col:colorMap.orange},
+{type:“red”,    label:“deep clean”,col:colorMap.red},
+{type:“violet”, label:“refresh”,   col:colorMap.violet},
+{type:“pink”,   label:“priest”,    col:colorMap.pink},
+{type:“brown”,  label:“fixed”,     col:colorMap.brown},
+{type:“blue”,   label:“itinerancy”,col:colorMap.blue},
+{type:“lblue”,  label:“emergency”, col:colorMap.lblue},
+].filter(c=>counts[c.type]);
+if (!chips.length) return null;
+return (
+<div style={{display:“flex”,flexWrap:“wrap”,gap:6,marginBottom:16}}>
+{chips.map(c=>(
+<div key={c.type} style={{
+fontSize:10,fontWeight:700,padding:“4px 12px”,borderRadius:20,
+border:`1.5px solid ${c.col.border}`,
+background:c.col.bg,color:c.col.border,
+}}>
+{counts[c.type]} {c.label}
+</div>
+))}
+</div>
+);
+}
+
+const LEGEND = [
+{color:“green”, label:“Available (guest room)”},
+{color:“orange”,label:“Occupied by guest”},
+{color:“red”,   label:“Needs deep clean”},
+{color:“violet”,label:“Light refresh needed (2 weeks)”},
+{color:“pink”,  label:“Priest room”},
+{color:“brown”, label:“Fixed (seminarian/student)”},
+{color:“blue”,  label:“Itinerancy”},
+{color:“lblue”, label:“Emergency room”},
+];
+
+// ── MODAL ──────────────────────────────────────────────────
+
+function Toggle({ value, onChange }) {
+return (
+<button type=“button” onClick={()=>onChange(!value)} style={{
+width:52,height:30,borderRadius:15,
+background:value?C.green:C.border,
+border:“none”,cursor:“pointer”,position:“relative”,
+flexShrink:0,transition:“background .2s”,
+}}>
+<div style={{
+position:“absolute”,width:24,height:24,borderRadius:“50%”,
+background:“white”,top:3,left:3,
+transform:value?“translateX(22px)”:“none”,
+transition:“transform .2s”,
+boxShadow:“0 1px 4px rgba(0,0,0,.25)”,
+}}/>
+</button>
+);
+}
+
+function Modal({ roomId, rooms, onClose, onSave }) {
+const r = rooms[roomId];
+const [form, setForm] = useState({ …r });
+const [checks, setChecks] = useState({});
+
+if (!r) return null;
+const t = form.type || “”;
+const col = colorMap[t] || {};
+const fmt = s => s ? new Date(s+“T12:00:00”).toLocaleDateString(“en-GB”,{day:“2-digit”,month:“2-digit”}) : “”;
+const today = () => new Date().toISOString().split(“T”)[0];
+const yearFrom = s => { const d=new Date((s||today())+“T12:00:00”);d.setFullYear(d.getFullYear()+1);d.setDate(d.getDate()-1);return d.toISOString().split(“T”)[0]; };
+
+const TYPE2COLOR = {normal:“green”,priest:“pink”,fixed:“brown”,emergency:“lblue”,itinerancy:“blue”,resident:“gray”};
+
+const handleSave = () => {
+let updated = {…form};
+if (!r.configured || !r.type) {
+updated.type = TYPE2COLOR[form.roomType]||“green”;
+updated.configured = true;
+if(form.roomType===“priest” && form.name) updated.owner=form.name;
+} else if (r.type===“orange” && form.type===“green”) {
+updated = {…form, type:“red”, name:r.owner||””, from:””, to:””};
+}
+onSave(updated);
+};
+
+const isCleaning = t===“red” || t===“violet”;
+const cleanItems = t===“red” ? DEEP_ITEMS : LIGHT_ITEMS;
+
+const sec = (label) => (
+<div style={{fontSize:10,fontWeight:700,letterSpacing:.8,textTransform:“uppercase”,color:C.text3,paddingBottom:6,borderBottom:`1.5px solid ${C.border}`}}>
+{label}
+</div>
+);
+
+const field = (label, id, val, type=“text”) => (
+<div style={{display:“flex”,flexDirection:“column”,gap:6}}>
+<div style={{fontSize:10,fontWeight:700,letterSpacing:.7,textTransform:“uppercase”,color:C.text2}}>{label}</div>
+<input type={type} value={val||””} onChange={e=>setForm(f=>({…f,[id]:e.target.value}))}
+style={{background:C.bg,border:`1.5px solid ${C.border}`,borderRadius:10,padding:“11px 13px”,fontFamily:“inherit”,fontSize:15,color:C.text,outline:“none”,width:“100%”}}/>
+</div>
+);
+
+return (
+<div onClick={e=>e.target===e.currentTarget&&onClose()} style={{
+position:“fixed”,inset:0,background:“rgba(0,0,0,.55)”,
+zIndex:800,display:“flex”,alignItems:“flex-end”,justifyContent:“center”,
+}}>
+<div style={{
+background:”#FFFFFF”,width:“100%”,maxWidth:520,
+borderRadius:“22px 22px 0 0”,maxHeight:“90vh”,
+display:“flex”,flexDirection:“column”,
+boxShadow:“0 -4px 32px rgba(0,0,0,.22)”,
+}}>
+{/* drag handle */}
+<div style={{width:36,height:4,background:C.border,borderRadius:2,margin:“12px auto 0”,flexShrink:0}}/>
+
+```
+    {/* header */}
+    <div style={{padding:"14px 20px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:13,flexShrink:0,background:"#FFFFFF",borderRadius:"22px 22px 0 0"}}>
+      <div style={{width:46,height:46,borderRadius:12,background:col.bg||C.surface2,border:`2px solid ${col.border||C.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>
+        {form.name?form.name[0].toUpperCase():"?"}
+      </div>
       <div>
-        <div class="modal-title" id="modal-title">Room</div>
-        <div class="modal-sub"   id="modal-sub"></div>
+        <div style={{fontFamily:"serif",fontSize:19,color:C.text}}>{form.name||"Room"}</div>
+        <div style={{fontSize:12,color:C.text2,marginTop:3}}>{form.roomType?TYPE_LBL[form.roomType]:"Not configured"}{form.carpet?" · 🪵 Carpet":""}</div>
       </div>
     </div>
-    <div class="modal-body" id="modal-body"></div>
-    <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-      <button class="btn-save" id="btn-save" onclick="saveRoom()">Save</button>
+
+    {/* body */}
+    <div style={{padding:"18px 20px",overflowY:"auto",flex:1,display:"flex",flexDirection:"column",gap:16,background:"#FFFFFF"}}>
+
+      {/* NOT CONFIGURED */}
+      {(!r.configured||!r.type) && <>
+        {sec("Configure Room")}
+        <div style={{display:"flex",flexDirection:"column",gap:6}}>
+          <div style={{fontSize:10,fontWeight:700,letterSpacing:.7,textTransform:"uppercase",color:C.text2}}>Room type</div>
+          <select value={form.roomType||"normal"} onChange={e=>setForm(f=>({...f,roomType:e.target.value}))}
+            style={{background:C.bg,border:`1.5px solid ${C.border}`,borderRadius:10,padding:"11px 13px",fontFamily:"inherit",fontSize:15,color:C.text,outline:"none",width:"100%"}}>
+            <option value="normal">Normal (guest room)</option>
+            <option value="priest">Priest room</option>
+            <option value="fixed">Fixed (seminarian/student)</option>
+            <option value="emergency">Emergency room</option>
+            <option value="itinerancy">Annual itinerancy</option>
+            <option value="resident">Resident</option>
+          </select>
+        </div>
+        {field("Name / Occupant","name",form.name)}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:C.surface2,borderRadius:12,padding:"14px 16px",border:`1.5px solid ${C.border}`}}>
+          <div><div style={{fontSize:15,fontWeight:500,color:C.text}}>Has carpet</div><div style={{fontSize:11,color:C.text2,marginTop:2}}>Affects cleaning checklist</div></div>
+          <Toggle value={form.carpet} onChange={v=>setForm(f=>({...f,carpet:v}))}/>
+        </div>
+        {field("Notes","notes",form.notes)}
+      </>}
+
+      {/* CLEANING */}
+      {isCleaning && <>
+        <div style={{borderRadius:12,border:`2px solid ${t==="red"?C.orange:C.violet}`,padding:14,background:t==="red"?C.orangeLt:C.violetLt}}>
+          <div style={{fontSize:13,fontWeight:700,marginBottom:12,color:t==="red"?C.orange:C.violet}}>
+            {t==="red"?"🧹 Deep Cleaning Required":"🪣 Light Refresh Required"}
+          </div>
+          {cleanItems.map((lbl,i)=>(
+            <div key={i} onClick={()=>setChecks(c=>({...c,[i]:!c[i]}))}
+              style={{display:"flex",alignItems:"center",gap:12,padding:"8px 0",borderBottom:i<cleanItems.length-1?`1px solid rgba(0,0,0,.07)`:"none",cursor:"pointer"}}>
+              <div style={{width:24,height:24,borderRadius:7,border:`2px solid ${t==="red"?C.orange:C.violet}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,color:"white",background:checks[i]?(t==="red"?C.orange:C.violet):"white",flexShrink:0}}>
+                {checks[i]?"✓":""}
+              </div>
+              <div style={{fontSize:14,color:checks[i]?C.text3:C.text,textDecoration:checks[i]?"line-through":"none"}}>{lbl}</div>
+            </div>
+          ))}
+          <button onClick={()=>onSave({...r,type:"green",name:r.owner||"",from:"",to:""})}
+            style={{width:"100%",marginTop:14,fontFamily:"inherit",fontSize:13,fontWeight:700,padding:12,borderRadius:10,border:"none",color:"white",background:t==="red"?C.orange:C.violet,cursor:"pointer"}}>
+            ✓ Done — mark as available
+          </button>
+        </div>
+      </>}
+
+      {/* RESTORE (priest) */}
+      {r.roomType==="priest"&&r.owner&&form.name!==r.owner&&(
+        <div style={{background:C.pinkLt,border:`1.5px solid ${C.pink}`,borderRadius:12,padding:"12px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10}}>
+          <div style={{fontSize:13,color:C.pink}}>Owner: <strong>{r.owner}</strong></div>
+          <button onClick={()=>setForm(f=>({...f,name:r.owner,from:"",to:""}))}
+            style={{fontFamily:"inherit",fontSize:12,fontWeight:700,padding:"8px 14px",borderRadius:9,border:"none",background:C.pink,color:"white",cursor:"pointer"}}>
+            ↩ Restore
+          </button>
+        </div>
+      )}
+
+      {/* STATUS */}
+      {r.configured&&r.type&&!isCleaning&&(r.roomType==="normal"||r.roomType==="emergency")&&<>
+        {sec("Status")}
+        <div style={{display:"flex",gap:8}}>
+          {["green","orange"].map(s=>(
+            <button key={s} onClick={()=>setForm(f=>({...f,type:s}))}
+              style={{flex:1,fontFamily:"inherit",fontSize:13,fontWeight:600,padding:"12px 10px",borderRadius:10,textAlign:"center",cursor:"pointer",
+                border:`2px solid ${form.type===s?colorMap[s].border:C.border}`,
+                background:form.type===s?colorMap[s].bg:"#FFFFFF",
+                color:form.type===s?colorMap[s].border:C.text2}}>
+              {s==="green"?"✓ Available":"● Occupied"}
+            </button>
+          ))}
+        </div>
+      </>}
+
+      {/* OCCUPANT + DATES */}
+      {r.configured&&r.type&&!isCleaning&&<>
+        {sec("Occupant")}
+        {field("Name","name",form.name)}
+        {sec("Stay period")}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+          {field("From","from",form.from,"date")}
+          {field("To","to",form.to,"date")}
+        </div>
+        <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+          <button onClick={()=>{ const f=today(); setForm(fv=>({...fv,from:f,to:yearFrom(f)})); }}
+            style={{fontFamily:"inherit",fontSize:11,fontWeight:600,padding:"7px 13px",borderRadius:8,border:`1.5px solid ${C.border}`,background:C.surface2,color:C.text2,cursor:"pointer"}}>
+            📅 Full year
+          </button>
+          <button onClick={()=>setForm(f=>({...f,from:today()}))}
+            style={{fontFamily:"inherit",fontSize:11,fontWeight:600,padding:"7px 13px",borderRadius:8,border:`1.5px solid ${C.border}`,background:C.surface2,color:C.text2,cursor:"pointer"}}>
+            📅 From today
+          </button>
+        </div>
+        {sec("Room settings")}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:C.surface2,borderRadius:12,padding:"14px 16px",border:`1.5px solid ${C.border}`}}>
+          <div><div style={{fontSize:15,fontWeight:500,color:C.text}}>Has carpet</div><div style={{fontSize:11,color:C.text2,marginTop:2}}>Affects cleaning checklist</div></div>
+          <Toggle value={form.carpet} onChange={v=>setForm(f=>({...f,carpet:v}))}/>
+        </div>
+        {field("Notes","notes",form.notes)}
+      </>}
+
+    </div>
+
+    {/* footer */}
+    <div style={{padding:"12px 20px",borderTop:`1px solid ${C.border}`,display:"flex",gap:10,flexShrink:0,background:"#FFFFFF"}}>
+      <button onClick={onClose} style={{fontFamily:"inherit",fontSize:14,fontWeight:500,padding:"12px 18px",borderRadius:11,border:`1.5px solid ${C.border}`,background:"#FFFFFF",color:C.text2,cursor:"pointer"}}>
+        Cancel
+      </button>
+      <button onClick={handleSave} style={{flex:1,fontFamily:"inherit",fontSize:14,fontWeight:700,padding:12,borderRadius:11,border:"none",background:C.text,color:"white",cursor:"pointer"}}>
+        {(!r.configured||!r.type)?"Configure & Save":"Save"}
+      </button>
     </div>
   </div>
 </div>
+```
 
-<div class="toast" id="toast"></div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const fbApp = initializeApp({
-  apiKey:"AIzaSyDkcw4HhYnXotrbuyvD84ONvTJrbbxxAhg",
-  authDomain:"rm-guest-room.firebaseapp.com",
-  projectId:"rm-guest-room",
-  storageBucket:"rm-guest-room.firebasestorage.app",
-  messagingSenderId:"410582754379",
-  appId:"1:410582754379:web:c5937416c15514a18699ce",
-  databaseURL:"https://rm-guest-room-default-rtdb.europe-west1.firebasedatabase.app"
-});
-const db = getDatabase(fbApp);
-const DB_KEY = 'rmgh_v6';
-
-const TWO_WEEKS = 14*24*3600*1000;
-const TYPE2COLOR = {normal:'green',priest:'pink',fixed:'brown',emergency:'blue',itinerancy:'blue',resident:'gray'};
-const TYPE_LBL   = {normal:'Normal',priest:'Priest',fixed:'Fixed',emergency:'Emergency',itinerancy:'Itinerancy',resident:'Resident'};
-const COL_BG     = {green:'var(--green-bg)',red:'var(--red-bg)',violet:'var(--violet-bg)',orange:'var(--orange-bg)',pink:'var(--pink-bg)',brown:'var(--brown-bg)',blue:'var(--blue-bg)',gray:'var(--gray-bg)'};
-const COL_MAIN   = {green:'var(--green)',   red:'var(--red)',   violet:'var(--violet)',   orange:'var(--orange)',  pink:'var(--pink)',   brown:'var(--brown)',   blue:'var(--blue)',   gray:'var(--gray)'  };
-const DEEP  = ['Vacuum the floor','Dust all surfaces','Clean surfaces & desk','Change bed linen & make bed','Change towel','Refill soap / toiletries'];
-const LIGHT = ['Dust all surfaces'];
-
-const F1 = [
-  {id:'f1-a1',col:1,row:1,kind:'room'},{id:'f1-a2',col:2,row:1,kind:'room'},
-  {id:'f1-b1',col:1,row:2,kind:'room'},{id:'f1-b2',col:2,row:2,kind:'room'},
-  {col:3,row:1,rowspan:2,kind:'stair'},
-  {id:'f1-c1',col:4,row:1,kind:'room',defaultType:'priest'},
-  {id:'f1-c2',col:5,row:1,kind:'room'},
-  {id:'f1-c3',col:6,row:1,kind:'room'},
-  {id:'f1-d1',col:4,row:2,kind:'room',defaultType:'priest'},
-  {id:'f1-d2',col:5,row:2,kind:'room'},
-  {col:6,row:2,kind:'x'},
-];
-const F2 = [
-  {id:'f2-t1',col:1,row:1,kind:'room',defaultType:'emergency'},
-  {col:2,row:1,kind:'label',label:'ART\nROOM'},
-  {col:3,row:1,rowspan:2,kind:'stair'},
-  {id:'f2-t2',col:4,row:1,kind:'room',defaultType:'emergency'},
-  {id:'f2-t3',col:5,row:1,kind:'room'},{id:'f2-t4',col:6,row:1,kind:'room'},
-  {id:'f2-t5',col:7,row:1,kind:'room'},{id:'f2-t6',col:8,row:1,kind:'room'},
-  {id:'f2-t7',col:9,row:1,kind:'room'},
-  {col:10,row:1,kind:'label',label:'WC'},
-  {col:11,row:1,rowspan:1,kind:'stair'},
-  {id:'f2-b1',col:1,row:2,kind:'room'},{id:'f2-b2',col:2,row:2,kind:'room'},
-  {id:'f2-b3',col:4,row:2,kind:'room'},{id:'f2-b4',col:5,row:2,kind:'room'},
-  {id:'f2-b5',col:6,row:2,kind:'room'},{id:'f2-b6',col:7,row:2,kind:'room'},
-  {id:'f2-b7',col:8,row:2,kind:'room'},{id:'f2-b8',col:9,row:2,kind:'room'},
-  {id:'f2-b9',col:10,row:2,kind:'room'},{id:'f2-b10',col:11,row:2,kind:'room'},
-];
-
-function allRoomDefs(){ return [...F1,...F2].filter(d=>d.kind==='room').map(d=>({floor:d.id.startsWith('f1')?'f1':'f2',...d})); }
-
-let rooms={}, curId=null, cleanCk={}, appReady=false;
-
-const syncDot = document.getElementById('sync-dot');
-function setSyncStatus(s){ syncDot.className='sync-dot '+(s==='ok'?'ok':s==='saving'?'saving':'err'); }
-
-onValue(ref(db,DB_KEY), snap=>{
-  const data=snap.val();
-  if(!data){
-    const init={};
-    allRoomDefs().forEach(d=>{init[d.id]=mkDef(d);});
-    set(ref(db,DB_KEY),init);
-    return;
-  }
-  rooms={};
-  allRoomDefs().forEach(d=>{
-    const s=data[d.id]||{};
-    const def=mkDef(d);
-    rooms[d.id]={
-      ...def,
-      type:      s.type      !==undefined?s.type      :def.type,
-      roomType:  s.roomType  !==undefined?s.roomType  :def.roomType,
-      name:      s.name      !==undefined?s.name      :'',
-      owner:     s.owner     !==undefined?s.owner     :null,
-      from:      s.from      !==undefined?s.from      :'',
-      to:        s.to        !==undefined?s.to        :'',
-      notes:     s.notes     !==undefined?s.notes     :'',
-      carpet:    s.carpet    !==undefined?s.carpet    :false,
-      greenSince:s.greenSince!==undefined?s.greenSince:def.greenSince,
-      configured:s.configured!==undefined?s.configured:def.configured,
-    };
-  });
-  checkTimers(); renderAll(); setSyncStatus('ok');
-  if(!appReady){document.getElementById('loading').style.display='none';appReady=true;}
-},()=>setSyncStatus('err'));
-
-function mkDef(d){
-  const color=d.defaultType?(TYPE2COLOR[d.defaultType]||'green'):'';
-  return {id:d.id,floor:d.floor,type:color,roomType:d.defaultType||null,name:'',owner:null,from:'',to:'',notes:'',carpet:false,greenSince:color==='green'?Date.now():null,configured:!!d.defaultType};
-}
-function saveToDB(r){
-  setSyncStatus('saving');
-  set(ref(db,DB_KEY+'/'+r.id),r).then(()=>setSyncStatus('ok')).catch(()=>setSyncStatus('err'));
+);
 }
 
-function checkTimers(){
-  const now=Date.now();
-  Object.values(rooms).forEach(r=>{
-    if(!r.configured)return;
-    if(r.type==='green'&&r.greenSince&&now-r.greenSince>=TWO_WEEKS){r.type='violet';r.greenSince=null;saveToDB(r);}
-    if(r.type==='red'&&r.to&&now>new Date(r.to+'T23:59:59').getTime()){r.type='orange';saveToDB(r);}
-  });
-}
-function daysLeft(r){
-  if(r.type!=='green'||!r.greenSince)return null;
-  const rem=TWO_WEEKS-(Date.now()-r.greenSince);
-  return rem<=0?0:Math.ceil(rem/86400000);
-}
-const fmt=s=>s?new Date(s+'T12:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit'}):'';
-const today=()=>new Date().toISOString().split('T')[0];
-function yearFrom(s){const d=new Date((s||today())+'T12:00:00');d.setFullYear(d.getFullYear()+1);d.setDate(d.getDate()-1);return d.toISOString().split('T')[0];}
+// ── MAIN APP ───────────────────────────────────────────────
+export default function App() {
+const [tab, setTab]   = useState(“f1”);
+const [rooms, setRooms] = useState(INIT_ROOMS);
+const [openId, setOpenId] = useState(null);
+const [toast, setToast]   = useState(null);
 
-function renderFloor(defs,gridEl){
-  const maxC=Math.max(...defs.map(d=>d.col+(d.colspan||1)-1));
-  const maxR=Math.max(...defs.map(d=>d.row+(d.rowspan||1)-1));
-  gridEl.style.gridTemplateColumns=`repeat(${maxC},var(--cell))`;
-  gridEl.style.gridTemplateRows   =`repeat(${maxR},var(--cell))`;
-  gridEl.innerHTML='';
-  defs.forEach(d=>{
-    const cs=d.colspan||1,rs=d.rowspan||1;
-    const pl=`grid-column:${d.col}/span ${cs};grid-row:${d.row}/span ${rs};`;
-    let el;
-    if(d.kind==='stair'){
-      el=document.createElement('div');el.className='stair-cell';
-      el.style.cssText=pl+`height:calc(var(--cell)*${rs}+var(--gap)*(${rs}-1));`;
-      el.innerHTML=`<div class="stair-label">S T A I R S</div>`;
-    } else if(d.kind==='label'){
-      el=document.createElement('div');el.className='label-cell';el.style.cssText=pl;
-      el.innerHTML=`<span>${(d.label||'').replace('\n','<br>')}</span>`;
-    } else if(d.kind==='x'){
-      el=document.createElement('div');el.className='room-cell excluded';el.style.cssText=pl;
-    } else if(d.kind==='room'){
-      el=buildCell(rooms[d.id],pl);
-    }
-    if(el)gridEl.appendChild(el);
-  });
-}
+const showToast = msg => { setToast(msg); setTimeout(()=>setToast(null),2600); };
 
-function buildCell(r,pl){
-  if(!r)return null;
-  const el=document.createElement('div');
-  el.style.cssText=pl;
-  el.onclick=()=>openModal(r.id);
-  if(!r.configured||!r.type){
-    el.className='room-cell empty';
-    el.innerHTML=`<div class="cell-hint">Tap to<br>configure</div>`;
-    return el;
-  }
-  el.className=`room-cell ${r.type}${r.carpet?' carpet':''}`;
-  const dl=daysLeft(r);
-  const timer=(dl!==null&&dl<=7)?`<div class="timer-badge">${dl}d</div>`:'';
-  el.innerHTML=`
-    ${timer}
-    <div class="cell-type">${r.roomType?TYPE_LBL[r.roomType]||'':''}</div>
-    <div class="cell-name">${r.name||(r.type==='green'?'Available':'')}</div>
-    ${(r.from&&r.to)?`<div class="cell-dates">${fmt(r.from)} → ${fmt(r.to)}</div>`:''}
-  `;
-  return el;
-}
-
-function renderStats(fid){
-  const fr=Object.values(rooms).filter(r=>r.floor===fid&&r.configured&&r.type);
-  const av=fr.filter(r=>r.type==='green').length;
-  const oc=fr.filter(r=>r.type==='red').length;
-  const dc=fr.filter(r=>r.type==='orange').length;
-  const lc=fr.filter(r=>r.type==='violet').length;
-  let h=`<div class="stat-chip" style="background:var(--green-bg);border-color:var(--green);color:var(--green)">${av} available</div>`;
-  if(oc)h+=`<div class="stat-chip" style="background:var(--red-bg);border-color:var(--red);color:var(--red)">${oc} occupied</div>`;
-  if(dc)h+=`<div class="stat-chip" style="background:var(--orange-bg);border-color:var(--orange);color:var(--orange)">${dc} deep clean</div>`;
-  if(lc)h+=`<div class="stat-chip" style="background:var(--violet-bg);border-color:var(--violet);color:var(--violet)">${lc} refreshing</div>`;
-  document.getElementById('stats-'+fid).innerHTML=h;
-}
-function renderAll(){
-  renderFloor(F1,document.getElementById('grid-f1'));
-  renderFloor(F2,document.getElementById('grid-f2'));
-  renderStats('f1');renderStats('f2');
-}
-
-window.switchTab=function(id){
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['f1','f2','si'][i]===id));
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
+const handleSave = (updated) => {
+setRooms(r=>({…r,[updated.id]:updated}));
+setOpenId(null);
+showToast(“Saved ✓”);
 };
 
-/* ── helpers for building modal DOM ── */
-function mkSec(t){const d=document.createElement('div');d.className='form-section';d.textContent=t;return d;}
-function mkNote(t){const d=document.createElement('div');d.className='info-note';d.textContent=t;return d;}
-function mkInp(lbl,id,val,type){
-  const g=document.createElement('div');g.className='form-group';
-  g.innerHTML=`<div class="form-label">${lbl}</div><input class="form-input" id="${id}" type="${type}" value="${val||''}" autocomplete="off">`;
-  return g;
+const tabs = [{id:“f1”,label:“1st Floor”},{id:“f2”,label:“2nd Floor”},{id:“si”,label:“Sisters”}];
+
+return (
+<div style={{fontFamily:”‘DM Sans’,sans-serif”,background:C.bg,color:C.text,minHeight:“100vh”,paddingBottom:50}}>
+
+```
+  {/* HEADER */}
+  <div style={{position:"sticky",top:0,zIndex:500,background:"#FFFFFF",borderBottom:`1px solid ${C.border}`,padding:"0 18px",height:56,display:"flex",alignItems:"center",justifyContent:"space-between",boxShadow:"0 1px 6px rgba(0,0,0,.07)"}}>
+    <div style={{fontFamily:"Georgia,serif",fontSize:18,fontWeight:400}}>RM <span style={{color:C.brown}}>Guest House</span></div>
+    <div style={{display:"flex",alignItems:"center",gap:10}}>
+      <div style={{width:8,height:8,borderRadius:"50%",background:C.green}}/>
+      <div style={{fontSize:11,color:C.text2,background:C.surface2,padding:"5px 12px",borderRadius:20,border:`1px solid ${C.border}`}}>
+        {new Date().toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})}
+      </div>
+    </div>
+  </div>
+
+  {/* TABS */}
+  <div style={{position:"sticky",top:56,zIndex:499,background:"#FFFFFF",borderBottom:`2px solid ${C.border}`,display:"flex"}}>
+    {tabs.map(t=>(
+      <button key={t.id} onClick={()=>setTab(t.id)} style={{
+        flex:1,border:"none",cursor:"pointer",fontFamily:"inherit",fontSize:13,fontWeight:700,
+        height:48,padding:"0 4px",
+        color:tab===t.id?C.brown:C.text3,
+        background:"#FFFFFF",
+        borderBottom:tab===t.id?`3px solid ${C.brown}`:"3px solid transparent",
+        marginBottom:-2,
+        textDecoration:tab===t.id?"underline":"none",
+        textUnderlineOffset:4,
+        transition:"color .15s,border-color .15s",
+      }}>
+        {t.label}
+      </button>
+    ))}
+  </div>
+
+  {/* PAGES */}
+  {tab==="f1" && (
+    <div style={{padding:"18px 14px"}}>
+      <StatsBar rooms={rooms} floor="f1"/>
+      {/* Legend */}
+      <div style={{display:"flex",flexWrap:"wrap",gap:"6px 14px",marginBottom:18}}>
+        {LEGEND.map(l=>(
+          <div key={l.color} style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:C.text2}}>
+            <div style={{width:13,height:13,borderRadius:4,border:`2px solid ${colorMap[l.color]?.border}`,background:colorMap[l.color]?.lt,flexShrink:0}}/>
+            {l.label}
+          </div>
+        ))}
+      </div>
+      <FloorPlan layout={F1_LAYOUT} rooms={rooms} onCellClick={setOpenId}/>
+    </div>
+  )}
+  {tab==="f2" && (
+    <div style={{padding:"18px 14px"}}>
+      <StatsBar rooms={rooms} floor="f2"/>
+      <FloorPlan layout={F2_LAYOUT} rooms={rooms} onCellClick={setOpenId}/>
+    </div>
+  )}
+  {tab==="si" && (
+    <div style={{textAlign:"center",padding:"70px 20px"}}>
+      <div style={{fontSize:48,marginBottom:14}}>🏠</div>
+      <div style={{fontFamily:"serif",fontSize:22,marginBottom:10}}>Sisters Floor</div>
+      <div style={{fontSize:13,color:C.text2,lineHeight:1.7,maxWidth:260,margin:"0 auto"}}>Send the floor plan and we'll build this section!</div>
+    </div>
+  )}
+
+  {/* MODAL */}
+  {openId && (
+    <Modal roomId={openId} rooms={rooms} onClose={()=>setOpenId(null)} onSave={handleSave}/>
+  )}
+
+  {/* TOAST */}
+  {toast && (
+    <div style={{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",background:C.text,color:"white",padding:"10px 22px",borderRadius:24,fontSize:13,fontWeight:600,boxShadow:"0 4px 18px rgba(0,0,0,.22)",zIndex:9000,whiteSpace:"nowrap"}}>
+      {toast}
+    </div>
+  )}
+</div>
+```
+
+);
 }
-function mkSel(lbl,id,opts,sel){
-  const g=document.createElement('div');g.className='form-group';
-  const os=opts.map(o=>`<option value="${o.v}"${o.v===sel?' selected':''}>${o.l}</option>`).join('');
-  g.innerHTML=`<div class="form-label">${lbl}</div><select class="form-input" id="${id}">${os}</select>`;
-  return g;
-}
-function mkCarpetRow(isOn){
-  const row=document.createElement('div');row.className='carpet-row';
-  row.innerHTML=`
-    <div class="carpet-label">Has carpet<small>Affects cleaning checklist</small></div>
-    <button type="button" class="toggle-sw${isOn?' on':''}" id="carpet-toggle"></button>`;
-  // Use setTimeout 0 so element is in DOM before we attach listener
-  setTimeout(()=>{
-    const btn=document.getElementById('carpet-toggle');
-    if(btn) btn.addEventListener('click',()=>btn.classList.toggle('on'));
-  },0);
-  return row;
-}
-function mkCleanBox(cls,title,items){
-  const box=document.createElement('div');box.className=`clean-box ${cls}`;
-  box.innerHTML=`<div class="clean-box-title">${title}</div>`;
-  items.forEach((lbl,i)=>{
-    cleanCk[i]=false;
-    const item=document.createElement('div');item.className='clean-item';
-    item.innerHTML=`<div class="clean-cb" id="chk-${i}"></div><div class="clean-item-lbl" id="lbl-${i}">${lbl}</div>`;
-    item.addEventListener('click',()=>{
-      cleanCk[i]=!cleanCk[i];
-      const chk=document.getElementById('chk-'+i);
-      const l=document.getElementById('lbl-'+i);
-      chk.classList.toggle('checked',cleanCk[i]);
-      chk.textContent=cleanCk[i]?'✓':'';
-      l.classList.toggle('done',cleanCk[i]);
-    });
-    box.appendChild(item);
-  });
-  const btn=document.createElement('button');btn.className='clean-done-btn';btn.textContent='✓ Done — mark as available';
-  btn.addEventListener('click',()=>{
-    const r=rooms[curId];
-    r.type='green';r.greenSince=Date.now();r.name=r.owner||'';r.from='';r.to='';
-    saveToDB(r);renderAll();closeModal();showToast('Room cleaned & available ✓');
-  });
-  box.appendChild(btn);return box;
-}
-
-window.openModal=function(id){
-  const r=rooms[id];if(!r)return;
-  curId=id;cleanCk={};
-  const body=document.getElementById('modal-body');body.innerHTML='';
-  const t=r.type||'';
-
-  // header
-  const icon=document.getElementById('modal-icon');
-  icon.style.background  =COL_BG[t]  ||'var(--surface2)';
-  icon.style.borderColor =COL_MAIN[t]||'var(--border)';
-  icon.style.color       =COL_MAIN[t]||'var(--text3)';
-  icon.textContent=r.name?r.name[0].toUpperCase():'?';
-  document.getElementById('modal-title').textContent=r.name||'Room';
-  document.getElementById('modal-sub').textContent=(r.roomType?TYPE_LBL[r.roomType]:'Not configured')+(r.carpet?' · 🪵 Carpet':'');
-  document.getElementById('btn-save').textContent='Save';
-
-  /* NOT CONFIGURED */
-  if(!r.configured||!t){
-    body.appendChild(mkSec('Configure Room'));
-    body.appendChild(mkSel('Room type','m-rt',[
-      {v:'normal',l:'Normal (guest room)'},{v:'priest',l:'Priest room'},
-      {v:'fixed',l:'Fixed (seminarian / student)'},{v:'emergency',l:'Emergency room'},
-      {v:'itinerancy',l:'Annual itinerancy'},{v:'resident',l:'Resident'},
-    ],r.roomType||'normal'));
-    body.appendChild(mkInp('Name / Occupant','m-name',r.name,'text'));
-    body.appendChild(mkCarpetRow(r.carpet));
-    body.appendChild(mkInp('Notes','m-notes',r.notes,'text'));
-    document.getElementById('btn-save').textContent='Configure & Save';
-    openSheet();return;
-  }
-
-  /* DEEP CLEAN */
-  if(t==='orange'){body.appendChild(mkCleanBox('deep-clean','🧹 Deep Cleaning Required',DEEP));body.appendChild(mkNote('Tick off each task, then mark as done.'));openSheet();return;}
-  /* LIGHT CLEAN */
-  if(t==='violet'){body.appendChild(mkCleanBox('light-clean','🪣 Light Refresh Required',LIGHT));body.appendChild(mkNote('Room has been free for 2 weeks. A light dust is needed.'));openSheet();return;}
-
-  /* RESTORE (priest temp guest) */
-  if(r.roomType==='priest'&&r.owner&&r.name!==r.owner){
-    const rb=document.createElement('div');rb.className='restore-box';
-    rb.innerHTML=`<div class="restore-lbl">Owner: <strong>${r.owner}</strong></div><button class="restore-btn" onclick="doRestore()">↩ Restore</button>`;
-    body.appendChild(rb);
-  }
-
-  /* STATUS */
-  if(r.roomType==='normal'||r.roomType==='emergency'){
-    body.appendChild(mkSec('Status'));
-    const sr=document.createElement('div');sr.className='status-row';
-    sr.innerHTML=`
-      <button class="status-btn ${t==='green'?'active-green':''}" id="sbg" onclick="setSt('green')">✓ Available</button>
-      <button class="status-btn ${t==='red'?'active-red':''}"   id="sbr" onclick="setSt('red')">● Occupied</button>`;
-    body.appendChild(sr);
-  }
-
-  /* OCCUPANT */
-  body.appendChild(mkSec('Occupant'));
-  body.appendChild(mkInp('Name','m-name',r.name,'text'));
-
-  /* DATES */
-  body.appendChild(mkSec('Stay period'));
-  const fr=document.createElement('div');fr.className='form-row';
-  fr.appendChild(mkInp('From','m-from',r.from,'date'));
-  fr.appendChild(mkInp('To','m-to',r.to,'date'));
-  body.appendChild(fr);
-  const dq=document.createElement('div');dq.className='date-shortcuts';
-  dq.innerHTML=`<button class="shortcut-btn" onclick="doFullYear()">📅 Full year</button><button class="shortcut-btn" onclick="doFromToday()">📅 From today</button>`;
-  body.appendChild(dq);
-
-  /* SETTINGS */
-  body.appendChild(mkSec('Room settings'));
-  body.appendChild(mkCarpetRow(r.carpet));
-  body.appendChild(mkInp('Notes','m-notes',r.notes,'text'));
-
-  /* RECONFIGURE */
-  const rc=document.createElement('button');rc.className='btn-reconfig';rc.textContent='⚙ Change room type';
-  rc.onclick=()=>{rooms[curId].configured=false;rooms[curId].type='';openModal(curId);};
-  body.appendChild(rc);
-
-  /* TIMER */
-  if(t==='green'&&r.greenSince){const dl=daysLeft(r);if(dl!==null&&dl<=10)body.appendChild(mkNote(`⏱ ${dl} day${dl!==1?'s':''} until refresh needed.`));}
-
-  openSheet();
-};
-
-function openSheet(){
-  document.getElementById('modal-overlay').classList.add('open');
-  setTimeout(()=>{document.getElementById('modal-body').scrollTop=0;},15);
-}
-
-window.setSt=function(s){
-  const r=rooms[curId];if(!r)return;
-  r.type=s;r.greenSince=s==='green'?Date.now():null;
-  const bg=document.getElementById('sbg'),br=document.getElementById('sbr');
-  if(bg)bg.className='status-btn'+(s==='green'?' active-green':'');
-  if(br)br.className='status-btn'+(s==='red'?' active-red':'');
-};
-window.doRestore=function(){
-  const r=rooms[curId];if(!r||!r.owner)return;
-  r.name=r.owner;r.from='';r.to='';
-  saveToDB(r);renderAll();showToast(`↩ Restored to ${r.owner}`);closeModal();
-};
-window.doFullYear=function(){
-  const f=today();
-  const fi=document.getElementById('m-from'),ti=document.getElementById('m-to');
-  if(fi)fi.value=f;if(ti)ti.value=yearFrom(f);
-};
-window.doFromToday=function(){const fi=document.getElementById('m-from');if(fi)fi.value=today();};
-
-window.saveRoom=function(){
-  const r=rooms[curId];if(!r)return;
-  const gv=id=>{const el=document.getElementById(id);return el?el.value.trim():'';}
-  const gc=()=>{const el=document.getElementById('carpet-toggle');return el?el.classList.contains('on'):false;}
-
-  if(!r.configured||!r.type){
-    const rt=document.getElementById('m-rt');
-    r.roomType=rt?rt.value:'normal';
-    r.name=gv('m-name');
-    r.owner=(r.roomType==='priest'&&r.name)?r.name:null;
-    r.carpet=gc();r.notes=gv('m-notes');
-    r.type=TYPE2COLOR[r.roomType]||'green';r.configured=true;
-    if(r.type==='green')r.greenSince=Date.now();
-    saveToDB(r);renderAll();closeModal();showToast('Room configured ✓');return;
-  }
-  const prev=r.type;
-  r.name=gv('m-name');
-  const mf=document.getElementById('m-from'),mt=document.getElementById('m-to');
-  if(mf)r.from=mf.value;if(mt)r.to=mt.value;
-  r.carpet=gc();r.notes=gv('m-notes');
-
-  if(prev==='red'&&r.type==='green'){
-    r.type='orange';r.greenSince=null;r.name=r.owner||'';r.from='';r.to='';
-    saveToDB(r);renderAll();closeModal();showToast('Room freed — deep clean needed 🧹');return;
-  }
-  saveToDB(r);renderAll();closeModal();showToast('Saved ✓');
-};
-
-window.closeModal=function(){
-  curId=null;cleanCk={};
-  document.getElementById('modal-overlay').classList.remove('open');
-};
-
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2600);
-}
-
-document.getElementById('date-chip').textContent=
-  new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-document.getElementById('modal-overlay').addEventListener('click',e=>{
-  if(e.target===document.getElementById('modal-overlay'))closeModal();
-});
-setSyncStatus('saving');
-setInterval(()=>{checkTimers();renderAll();},30*60*1000);
-</script>
-
-</body>
-</html>
