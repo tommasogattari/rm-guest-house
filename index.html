@@ -76,14 +76,12 @@ header{position:sticky;top:0;z-index:500;background:#FFFFFF;border-bottom:1px so
 .room-cell.lblue  {background:var(–lblue-lt); border-color:var(–lblue)}
 .room-cell.gray   {background:var(–gray-lt);  border-color:var(–gray)}
 .room-cell.empty  {background:#E8E4DA;border:2.5px dashed #B0A898}
-/* violet dot on green cell (approaching 2-week refresh) */
-.room-cell.green.needs-refresh::before{content:’’;position:absolute;top:6px;left:6px;width:9px;height:9px;border-radius:50%;background:var(–violet);border:1.5px solid #FFFFFF;z-index:1}
+/* violet dot on green cell (approaching 2-week refresh) — rendered as DOM element */
+.refresh-dot{position:absolute;top:6px;left:6px;width:9px;height:9px;border-radius:50%;background:var(–violet);border:1.5px solid #FFFFFF;z-index:2;pointer-events:none}
 .room-cell.excluded{background:var(–bg);border:2px dashed #CCC;cursor:default}
 .room-cell.excluded::before,.room-cell.excluded::after{content:’’;position:absolute;background:#CCC;width:130%;height:2px;top:50%;left:-15%}
 .room-cell.excluded::before{transform:rotate(30deg)}.room-cell.excluded::after{transform:rotate(-30deg)}
-/* NO-CARPET indicator (small icon top-right when room has NO carpet) */
-.room-cell .no-carpet-icon{position:absolute;top:5px;right:5px;font-size:11px;opacity:.7;line-height:1}
-/* carpet stripe at bottom — shown when carpet=true (default) */
+/* CARPET: default = has carpet (colored stripe at bottom) */
 .room-cell.carpet::after{content:’’;position:absolute;bottom:0;left:0;right:0;height:5px;border-radius:0 0 8px 8px;opacity:.45}
 .room-cell.green.carpet::after  {background:var(–green)}
 .room-cell.red.carpet::after    {background:var(–red)}
@@ -95,6 +93,18 @@ header{position:sticky;top:0;z-index:500;background:#FFFFFF;border-bottom:1px so
 .room-cell.lblue.carpet::after  {background:var(–lblue)}
 .room-cell.gray.carpet::after   {background:var(–gray)}
 .room-cell.empty.carpet::after  {background:#B0A898}
+/* NO CARPET: show subtle wood-floor lines across the cell */
+.room-cell.no-carpet::before{
+content:’’;position:absolute;inset:0;border-radius:8px;
+background-image:repeating-linear-gradient(
+0deg,
+transparent,
+transparent 10px,
+rgba(160,130,90,.13) 10px,
+rgba(160,130,90,.13) 11px
+);
+pointer-events:none;z-index:0;
+}
 /* cell text */
 .cell-type{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;opacity:.7;line-height:1;margin-bottom:2px}
 .cell-name{font-size:11px;font-weight:600;color:var(–text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
@@ -118,6 +128,8 @@ header{position:sticky;top:0;z-index:500;background:#FFFFFF;border-bottom:1px so
 .label-cell span{font-size:10px;font-weight:700;color:var(–text2);line-height:1.4;letter-spacing:.3px}
 .rector-cell{background:#EDE8DF;border-color:#B8A898;}
 .rector-cell span{color:#7A6858;font-size:10px;font-weight:700;}
+.library-cell{background:#E8EEE4;border-color:#8AAA78;}
+.library-cell span{color:#4A7A38;font-size:10px;font-weight:700;}
 
 /* ===================== MODAL ===================== */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;align-items:flex-end;justify-content:center}
@@ -324,7 +336,7 @@ const fbApp = initializeApp({
 });
 const db   = getDatabase(fbApp);
 const auth = getAuth(fbApp);
-const DB_KEY = 'rmgh_v10';
+const DB_KEY = 'rmgh_v11';
 
 const TWO_WEEKS = 14*24*3600*1000;
 // Color when first configured (fixed rooms get their color immediately)
@@ -340,9 +352,9 @@ const F1 = [
   // Top-left: one bookable room + rector office (fixed, not bookable)
   {id:'f1-a1',col:1,row:1,kind:'room'},
   {col:2,row:1,kind:'rector'},
-  // Bottom-left: only ONE bookable room (second cell removed)
-  {id:'f1-b1',col:1,row:2,kind:'room'},
-  {col:2,row:2,kind:'gap'},
+  // Bottom-left: Little Library (fixed) + one bookable room
+  {col:1,row:2,kind:'library'},
+  {id:'f1-b1',col:2,row:2,kind:'room'},
   // Staircase spans both rows
   {col:3,row:1,rowspan:2,kind:'stair'},
   // Right block top row
@@ -540,6 +552,9 @@ function renderFloor(defs,gridEl){
     } else if(d.kind==='rector'){
       el=document.createElement('div');el.className='label-cell rector-cell';el.style.cssText=pl;
       el.innerHTML=`<span>Rector<br>Office</span>`;
+    } else if(d.kind==='library'){
+      el=document.createElement('div');el.className='label-cell library-cell';el.style.cssText=pl;
+      el.innerHTML=`<span>Little<br>Library</span>`;
     } else if(d.kind==='gap'){
       el=document.createElement('div');
       el.style.cssText=pl+`width:var(--cell);height:var(--cell);`;
@@ -565,13 +580,12 @@ function buildCell(r,pl){
     el.innerHTML=`<div class="cell-hint">Tap to<br>configure</div>`;
     return el;
   }
-  el.className=`room-cell ${r.type}${r.carpet?' carpet':''}`;
   const dl=daysLeft(r);
   const needsRefresh=r.type==='green'&&dl!==null&&dl<=7;
-  if(needsRefresh)el.classList.add('needs-refresh');
-  const noCarpetIcon=!r.carpet?`<div class="no-carpet-icon">🚫🪵</div>`:'';
+  const carpetClass = r.carpet ? 'carpet' : 'no-carpet';
+  el.className=`room-cell ${r.type} ${carpetClass}`;
   el.innerHTML=`
-    ${noCarpetIcon}
+    ${needsRefresh?'<div class="refresh-dot"></div>':''}
     <div class="cell-type">${r.roomType?TYPE_LBL[r.roomType]||'':''}</div>
     <div class="cell-name">${r.name||(r.type==='green'?'Available':r.type==='orange'?'Occupied':'')}</div>
     ${(r.from&&r.to)?`<div class="cell-dates">${fmt(r.from)} → ${fmt(r.to)}</div>`:''}
@@ -632,7 +646,7 @@ function mkCarpetRow(hasCarpet){
   const noCarpet = !hasCarpet;
   const row=document.createElement('div');row.className='carpet-row';
   row.innerHTML=`
-    <div class="carpet-label">No carpet<small>Toggle ON if this room has no carpet</small></div>
+    <div class="carpet-label">No carpet<small>Turn ON if this room has no carpet (shows floor pattern)</small></div>
     <button type="button" class="toggle-sw${noCarpet?' on':''}" id="carpet-toggle"></button>`;
   setTimeout(()=>{
     const btn=document.getElementById('carpet-toggle');
