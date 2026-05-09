@@ -220,6 +220,16 @@ select.form-input{cursor:pointer}
 /* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--text);color:#FFFFFF;padding:10px 22px;border-radius:24px;font-size:13px;font-weight:600;box-shadow:0 4px 18px rgba(0,0,0,.22);z-index:9000;opacity:0;transition:transform .22s,opacity .22s;white-space:nowrap}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ── MAP EDITOR ── */
+.edit-mode .room-cell,.edit-mode .label-cell,.edit-mode .stair-cell{cursor:pointer!important;outline:2px dashed rgba(200,100,0,.35);outline-offset:-2px}
+.edit-mode .room-cell:hover,.edit-mode .label-cell:hover,.edit-mode .stair-cell:hover{outline-color:var(--red);outline-width:2px}
+.empty-slot{width:var(--cell);height:var(--cell);border-radius:10px;border:2px dashed #CCC;background:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;font-size:18px;color:#CCC}
+.empty-slot.drag-over{border-color:var(--orange)!important;background:var(--orange-lt)!important;transform:scale(1.05)}
+.palette-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;width:72px;height:72px;border-radius:10px;border:2px solid;cursor:grab;font-size:9px;font-weight:700;text-align:center;padding:6px;line-height:1.3;transition:transform .1s;-webkit-user-select:none;user-select:none;gap:4px}
+.palette-tile:active{cursor:grabbing;transform:scale(.93)}
+.delete-overlay{position:absolute;inset:0;background:rgba(168,40,40,.75);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:20px;opacity:0;transition:opacity .15s;pointer-events:none}
+.edit-mode .room-cell:hover .delete-overlay,.edit-mode .label-cell:hover .delete-overlay,.edit-mode .stair-cell:hover .delete-overlay{opacity:1}
 </style>
 </head>
 <body>
@@ -256,6 +266,10 @@ select.form-input{cursor:pointer}
   <div class="h-right">
     <div class="sync-dot" id="sync-dot"></div>
     <div class="date-chip" id="date-chip"></div>
+    <button id="edit-map-btn" onclick="toggleEditMode()"
+      style="font-family:inherit;font-size:11px;font-weight:600;padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer">
+      ✏️ Edit Map
+    </button>
     <button onclick="doLogout()" title="Sign out"
       style="font-family:inherit;font-size:11px;font-weight:600;padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer">
       Sign out
@@ -267,6 +281,19 @@ select.form-input{cursor:pointer}
   <button class="tab-btn active" onclick="switchTab('f1')">1st Floor</button>
   <button class="tab-btn"        onclick="switchTab('f2')">2nd Floor</button>
   <button class="tab-btn"        onclick="switchTab('si')">Sisters</button>
+</div>
+
+<!-- MAP EDITOR PANEL -->
+<div id="editor-panel" style="display:none;background:#FFF8F0;border-bottom:2px solid var(--orange);padding:14px 16px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+    <div style="font-size:13px;font-weight:700;color:var(--orange)">✏️ Map Edit Mode — drag cells onto the grid</div>
+    <div style="display:flex;gap:8px">
+      <button onclick="cancelEditMode()" style="font-family:inherit;font-size:12px;font-weight:600;padding:7px 14px;border-radius:9px;border:1.5px solid var(--border);background:#FFF;color:var(--text2);cursor:pointer">Cancel</button>
+      <button onclick="saveMap()" style="font-family:inherit;font-size:12px;font-weight:700;padding:7px 14px;border-radius:9px;border:none;background:var(--orange);color:white;cursor:pointer">💾 Save Map</button>
+    </div>
+  </div>
+  <div style="font-size:11px;color:var(--text2);margin-bottom:10px">Drag a tile below onto any empty slot. Click an existing cell to remove it.</div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px" id="drag-palette"></div>
 </div>
 
 <div class="page active" id="page-f1">
@@ -419,6 +446,7 @@ onAuthStateChanged(auth,user=>{
 });
 
 function initApp(){
+  loadSavedLayouts(()=>{
 onValue(ref(db,DB_KEY), snap=>{
   const data=snap.val();
   // Build rooms from Firebase data (or defaults if empty)
@@ -514,9 +542,15 @@ function checkTimers(){
   Object.values(rooms).forEach(r=>{
     if(!r.configured)return;
     // Green → Violet after 2 weeks unused
-    if(r.type==='green'&&r.greenSince&&now-r.greenSince>=TWO_WEEKS){r.type='violet';r.greenSince=null;saveToDB(r);}
+    if(r.type==='green'&&r.greenSince&&now-r.greenSince>=TWO_WEEKS){
+      r._prevType='green';
+      r.type='violet';r.greenSince=null;saveToDB(r);
+    }
     // Orange (occupied) → Red (deep clean) when end date passes
-    if(r.type==='orange'&&r.to&&now>new Date(r.to+'T23:59:59').getTime()){r.type='red';saveToDB(r);}
+    if(r.type==='orange'&&r.to&&now>new Date(r.to+'T23:59:59').getTime()){
+      r._prevType='orange';
+      r.type='red';saveToDB(r);
+    }
   });
 }
 function daysLeft(r){
@@ -633,7 +667,214 @@ window.switchTab=function(id){
   document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['f1','f2','si'][i]===id));
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
+  currentEditFloor = id; // track which floor is being edited
+  if(editMode) renderEditGrid();
 };
+
+// ── MAP EDITOR ────────────────────────────────────────────
+let editMode = false;
+let currentEditFloor = 'f1';
+let editLayouts = {}; // working copies during edit
+let dragTileData = null;
+
+// Palette of tiles the user can drag onto the map
+const PALETTE = [
+  {kind:'room',    label:'Room',      icon:'🚪', bg:'var(--green-lt)',  border:'var(--green)'},
+  {kind:'x',       label:'Excluded',  icon:'✕',  bg:'var(--bg)',        border:'#CCC'},
+  {kind:'stair',   label:'Stairs',    icon:'🪜', bg:'var(--surface2)', border:'var(--border)'},
+  {kind:'rector',  label:'Rector\nOffice', icon:'🏛', bg:'#EDE8DF',    border:'#B8A898'},
+  {kind:'library', label:'Little\nLibrary',icon:'📚',bg:'#E8EEE4',     border:'#8AAA78'},
+  {kind:'label',   label:'Label\n(WC etc)',icon:'🏷', bg:'var(--surface2)',border:'var(--border)'},
+];
+
+function toggleEditMode(){
+  editMode = !editMode;
+  const btn = document.getElementById('edit-map-btn');
+  const panel = document.getElementById('editor-panel');
+  if(editMode){
+    // Deep copy current layouts for editing
+    editLayouts = {
+      f1: JSON.parse(JSON.stringify(F1)),
+      f2: JSON.parse(JSON.stringify(F2)),
+    };
+    currentEditFloor = document.querySelector('.tab-btn.active')?.textContent.trim().includes('1') ? 'f1' : 'f2';
+    btn.textContent = '✕ Cancel Edit';
+    btn.style.borderColor = 'var(--red)';
+    btn.style.color = 'var(--red)';
+    panel.style.display = 'block';
+    buildPalette();
+    document.querySelectorAll('.page').forEach(p=>p.classList.add('edit-mode'));
+    renderEditGrid();
+  } else {
+    cancelEditMode();
+  }
+}
+
+function cancelEditMode(){
+  editMode = false;
+  editLayouts = {};
+  const btn = document.getElementById('edit-map-btn');
+  btn.textContent = '✏️ Edit Map';
+  btn.style.borderColor = '';
+  btn.style.color = '';
+  document.getElementById('editor-panel').style.display = 'none';
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('edit-mode'));
+  renderAll(); // restore normal view
+}
+
+function buildPalette(){
+  const pal = document.getElementById('drag-palette');
+  pal.innerHTML = '';
+  PALETTE.forEach(p=>{
+    const tile = document.createElement('div');
+    tile.className = 'palette-tile';
+    tile.style.cssText = `background:${p.bg};border-color:${p.border};color:${p.border}`;
+    tile.draggable = true;
+    tile.innerHTML = `<span style="font-size:20px">${p.icon}</span>${p.label.replace('\n','<br>')}`;
+    tile.addEventListener('dragstart', e=>{
+      dragTileData = {...p};
+      e.dataTransfer.effectAllowed = 'copy';
+    });
+    pal.appendChild(tile);
+  });
+}
+
+function getLayout(floor){ return editMode ? editLayouts[floor] : (floor==='f1'?F1:F2); }
+
+function renderEditGrid(){
+  const floor = currentEditFloor;
+  if(floor==='si') return;
+  const layout = editLayouts[floor];
+  const gridEl = document.getElementById('grid-'+floor);
+
+  // Find grid dimensions — expand by 1 in each direction for adding
+  const maxC = Math.max(...layout.map(d=>d.col+(d.colspan||1)-1)) + 1;
+  const maxR = Math.max(...layout.map(d=>d.row+(d.rowspan||1)-1)) + 1;
+
+  gridEl.style.gridTemplateColumns = `repeat(${maxC}, var(--cell))`;
+  gridEl.style.gridTemplateRows    = `repeat(${maxR}, var(--cell))`;
+  gridEl.innerHTML = '';
+
+  // Track occupied positions
+  const occupied = new Set();
+  layout.forEach(d=>{
+    for(let c=d.col;c<d.col+(d.colspan||1);c++){
+      for(let r=d.row;r<d.row+(d.rowspan||1);r++){
+        occupied.add(`${c},${r}`);
+      }
+    }
+  });
+
+  // Render existing cells with delete overlay
+  layout.forEach((d,idx)=>{
+    const cs=d.colspan||1, rs=d.rowspan||1;
+    const pl=`grid-column:${d.col}/span ${cs};grid-row:${d.row}/span ${rs};`;
+    let el;
+
+    if(d.kind==='stair'){
+      el=document.createElement('div');el.className='stair-cell';
+      el.style.cssText=pl+`height:calc(var(--cell)*${rs}+var(--gap)*(${rs}-1));`;
+      el.innerHTML=`<div class="stair-label">S T A I R S</div><div class="delete-overlay">🗑</div>`;
+    } else if(d.kind==='rector'){
+      el=document.createElement('div');el.className='label-cell rector-cell';el.style.cssText=pl;
+      el.innerHTML=`<span>Rector<br>Office</span><div class="delete-overlay">🗑</div>`;
+    } else if(d.kind==='library'){
+      el=document.createElement('div');el.className='label-cell library-cell';el.style.cssText=pl;
+      el.innerHTML=`<span>Little<br>Library</span><div class="delete-overlay">🗑</div>`;
+    } else if(d.kind==='label'){
+      el=document.createElement('div');el.className='label-cell';el.style.cssText=pl;
+      el.innerHTML=`<span>${(d.label||'Label').replace('\n','<br>')}</span><div class="delete-overlay">🗑</div>`;
+    } else if(d.kind==='x'){
+      el=document.createElement('div');el.className='room-cell excluded';el.style.cssText=pl;
+      el.innerHTML=`<div class="delete-overlay">🗑</div>`;
+    } else if(d.kind==='room'){
+      el=buildCell(rooms[d.id],pl);
+      if(el){const ov=document.createElement('div');ov.className='delete-overlay';ov.textContent='🗑';el.appendChild(ov);}
+    }
+
+    if(el){
+      el.addEventListener('click',()=>removeFromLayout(floor,idx));
+      gridEl.appendChild(el);
+    }
+  });
+
+  // Render empty slots for unoccupied positions
+  for(let r=1;r<=maxR;r++){
+    for(let c=1;c<=maxC;c++){
+      if(!occupied.has(`${c},${r}`)){
+        const slot=document.createElement('div');
+        slot.className='empty-slot';
+        slot.style.cssText=`grid-column:${c};grid-row:${r};`;
+        slot.textContent='+';
+        slot.addEventListener('dragover',e=>{e.preventDefault();slot.classList.add('drag-over');});
+        slot.addEventListener('dragleave',()=>slot.classList.remove('drag-over'));
+        slot.addEventListener('drop',e=>{
+          e.preventDefault();
+          slot.classList.remove('drag-over');
+          if(dragTileData) dropTileOnSlot(floor,c,r,dragTileData);
+        });
+        gridEl.appendChild(slot);
+      }
+    }
+  }
+}
+
+function removeFromLayout(floor, idx){
+  if(!confirm('Remove this cell from the map?')) return;
+  const d = editLayouts[floor][idx];
+  // If it's a room, keep the room data in Firebase but remove from layout
+  editLayouts[floor].splice(idx,1);
+  renderEditGrid();
+}
+
+function dropTileOnSlot(floor, col, row, tileData){
+  // Generate unique ID for new rooms
+  let newEntry = {col, row, kind: tileData.kind};
+  if(tileData.kind==='room'){
+    const existingIds = editLayouts[floor].filter(d=>d.id).map(d=>d.id);
+    let n=1;
+    while(existingIds.includes(`${floor}-new${n}`)) n++;
+    newEntry.id = `${floor}-new${n}`;
+  }
+  if(tileData.kind==='label'){
+    const lbl = prompt('Enter label text (e.g. WC, Storage):','');
+    if(!lbl) return;
+    newEntry.label = lbl;
+  }
+  editLayouts[floor].push(newEntry);
+  // If new room, create default room data
+  if(tileData.kind==='room'){
+    rooms[newEntry.id] = mkDef({id:newEntry.id, floor});
+  }
+  renderEditGrid();
+}
+
+window.saveMap=function(){
+  // Save layouts to Firebase
+  const layoutRef = ref(db, 'layouts');
+  set(layoutRef, {
+    f1: editLayouts.f1,
+    f2: editLayouts.f2,
+  }).then(()=>{
+    // Apply new layouts to live F1/F2 arrays
+    F1.length=0; editLayouts.f1.forEach(d=>F1.push(d));
+    F2.length=0; editLayouts.f2.forEach(d=>F2.push(d));
+    cancelEditMode();
+    showToast('Map saved ✓');
+  }).catch(()=>showToast('Error saving map'));
+};
+
+// Load saved layouts from Firebase on startup
+function loadSavedLayouts(cb){
+  onValue(ref(db,'layouts'), snap=>{
+    const data=snap.val();
+    if(data){
+      if(data.f1){ F1.length=0; data.f1.forEach(d=>F1.push(d)); }
+      if(data.f2){ F2.length=0; data.f2.forEach(d=>F2.push(d)); }
+    }
+    cb();
+  },{onlyOnce:true});
+}
 
 /* ── helpers for building modal DOM ── */
 function mkSec(t){const d=document.createElement('div');d.className='form-section';d.textContent=t;return d;}
@@ -700,14 +941,13 @@ function mkCleanBox(cls,title,items){
     const allDone=Object.values(cleanCk).filter(v=>v).length===total;
     if(!allDone)return;
     const r=rooms[curId];
-    // Mark as available — keep name/notes, only clear dates and reset status
-    r.type='green';
-    r.greenSince=Date.now();
-    r.from='';
-    r.to='';
-    // Only restore owner name if it's a priest room, otherwise keep existing name
-    if(r.roomType==='priest'&&r.owner) r.name=r.owner;
-    saveToDB(r);renderAll();closeModal();showToast('Room cleaned & available ✓');
+    const prevType=r._prevType||'green';
+    // Restore to previous state, keep ALL data (name, dates, notes)
+    r.type=prevType;
+    if(prevType==='green') r.greenSince=Date.now();
+    delete r._prevType;
+    saveToDB(r);renderAll();closeModal();
+    showToast('Cleaning done ✓ — room restored');
   });
   box.appendChild(btn);return box;
 }
@@ -716,6 +956,7 @@ window.openModal=function(id){
   const r=rooms[id];if(!r)return;
   curId=id;cleanCk={};
   const body=document.getElementById('modal-body');body.innerHTML='';
+  document.getElementById('btn-save').style.display='';  // always show by default
   const t=r.type||'';
 
   // header
@@ -744,9 +985,19 @@ window.openModal=function(id){
   }
 
   /* DEEP CLEAN */
-  if(t==='red'){body.appendChild(mkCleanBox('deep-clean','🧹 Deep Cleaning Required',DEEP));body.appendChild(mkNote('Tick off each task to enable the "Done" button.'));openSheet();return;}
+  if(t==='red'){
+    body.appendChild(mkCleanBox('deep-clean','🧹 Deep Cleaning Required',DEEP));
+    body.appendChild(mkNote('Tick off each task to enable the "Done" button.'));
+    document.getElementById('btn-save').style.display='none';
+    openSheet();return;
+  }
   /* LIGHT CLEAN */
-  if(t==='violet'){body.appendChild(mkCleanBox('light-clean','🪣 Light Refresh Required',LIGHT));body.appendChild(mkNote('Room has been free for 2 weeks. Tick the task to confirm.'));openSheet();return;}
+  if(t==='violet'){
+    body.appendChild(mkCleanBox('light-clean','🪣 Light Refresh Required',LIGHT));
+    body.appendChild(mkNote('Tick the task to confirm the refresh.'));
+    document.getElementById('btn-save').style.display='none';
+    openSheet();return;
+  }
 
   /* GREEN WITH VIOLET DOT — needs refresh banner */
   const dl=daysLeft(r);
@@ -841,6 +1092,10 @@ window.doRoomRefreshed=function(){
 };
 window.setManualClean=function(type){
   const r=rooms[curId];if(!r)return;
+  // Remember what state to restore to after cleaning
+  if(type==='red'||type==='violet'){
+    r._prevType=r.type; // save current state
+  }
   r.type=type;
   if(type==='green'){
     r.greenSince=Date.now();
@@ -956,6 +1211,7 @@ document.addEventListener('keydown',e=>{
 });
 setSyncStatus('saving');
 setInterval(()=>{checkTimers();renderAll();},30*60*1000);
+}); // end loadSavedLayouts
 } // end initApp
 
 document.getElementById('date-chip').textContent=
