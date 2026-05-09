@@ -357,7 +357,7 @@ const fbApp = initializeApp({
 });
 const db   = getDatabase(fbApp);
 const auth = getAuth(fbApp);
-const DB_KEY = 'rmgh_v12';
+const DB_KEY = 'rmgh_v13';
 
 const TWO_WEEKS = 14*24*3600*1000;
 // Color when first configured (fixed rooms get their color immediately)
@@ -455,9 +455,11 @@ function initApp(){
         allRoomDefs().forEach(d=>{
           const s = data ? data[d.id] : null;
           if(s && s.configured){
+            // If type is empty but roomType exists, derive the correct color
+            const derivedType = s.type || (s.roomType ? TYPE2COLOR[s.roomType]||'green' : '');
             rooms[d.id]={
               id:d.id, floor:d.floor,
-              type:       s.type       ||'',
+              type:       derivedType,
               roomType:   s.roomType   ||null,
               name:       s.name       ||'',
               owner:      s.owner      ||null,
@@ -465,10 +467,14 @@ function initApp(){
               to:         s.to         ||'',
               notes:      s.notes      ||'',
               carpet:     s.carpet     !==undefined ? s.carpet : true,
-              greenSince: s.greenSince ||null,
+              greenSince: s.greenSince ||(derivedType==='green'?Date.now():null),
               configured: true,
               _prevType:  s._prevType  ||null,
             };
+            // If we fixed a missing type, save it back to Firebase
+            if(!s.type && derivedType){
+              set(ref(db,DB_KEY+'/'+d.id+'/type'), derivedType);
+            }
           } else {
             rooms[d.id]=mkDef(d);
           }
