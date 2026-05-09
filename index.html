@@ -271,27 +271,19 @@ select.form-input{cursor:pointer}
 
 <div class="page active" id="page-f1">
   <div class="statsbar" id="stats-f1"></div>
-  <div class="legend">
-    <div class="leg-item"><div class="leg-dot" style="background:var(--green-lt);border-color:var(--green)"></div>Available (guest room)</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--orange-lt);border-color:var(--orange)"></div>Occupied by guest</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--red-lt);border-color:var(--red)"></div>Needs deep clean</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--violet-lt);border-color:var(--violet)"></div>Needs light refresh (2 weeks)</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--green-lt);border-color:var(--green);position:relative;overflow:visible"><span style="position:absolute;top:-2px;left:-2px;width:7px;height:7px;border-radius:50%;background:var(--violet);border:1px solid white;display:block"></span></div>Available — refresh soon</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--pink-lt);border-color:var(--pink)"></div>Priest room</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--brown-lt);border-color:var(--brown)"></div>Fixed (seminarian/student)</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--blue-lt);border-color:var(--blue)"></div>Itinerancy</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--lblue-lt);border-color:var(--lblue)"></div>Emergency room</div>
-  </div>
+  <div class="legend" id="legend-f1"></div>
   <div class="plan-scroll"><div class="plan-grid" id="grid-f1"></div></div>
 </div>
 
 <div class="page" id="page-f2">
   <div class="statsbar" id="stats-f2"></div>
+  <div class="legend" id="legend-f2"></div>
   <div class="plan-scroll"><div class="plan-grid" id="grid-f2"></div></div>
 </div>
 
 <div class="page" id="page-si">
-  <div style="text-align:center;padding:70px 20px">
+  <div class="legend" id="legend-si"></div>
+  <div style="text-align:center;padding:40px 20px">
     <div style="font-size:48px;margin-bottom:14px">🏠</div>
     <div style="font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:10px">Sisters Floor</div>
     <div style="font-size:13px;color:var(--text2);line-height:1.7;max-width:260px;margin:0 auto">Send the floor plan and we'll build this section!</div>
@@ -616,10 +608,25 @@ function renderStats(fid){
   if(!h)  h=`<div class="stat-chip" style="background:var(--surface2);border-color:var(--border);color:var(--text3)">No rooms configured yet</div>`;
   document.getElementById('stats-'+fid).innerHTML=h;
 }
+const LEGEND_HTML = `
+  <div class="leg-item"><div class="leg-dot" style="background:var(--green-lt);border-color:var(--green)"></div>Available</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--orange-lt);border-color:var(--orange)"></div>Occupied</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--red-lt);border-color:var(--red)"></div>Deep clean</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--violet-lt);border-color:var(--violet)"></div>Light refresh</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--pink-lt);border-color:var(--pink)"></div>Priest</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--brown-lt);border-color:var(--brown)"></div>Fixed</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--blue-lt);border-color:var(--blue)"></div>Itinerancy</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--lblue-lt);border-color:var(--lblue)"></div>Emergency</div>
+`;
 function renderAll(){
   renderFloor(F1,document.getElementById('grid-f1'));
   renderFloor(F2,document.getElementById('grid-f2'));
   renderStats('f1');renderStats('f2');
+  // Render legend on all pages (only once)
+  ['f1','f2','si'].forEach(id=>{
+    const el=document.getElementById('legend-'+id);
+    if(el&&!el.innerHTML) el.innerHTML=LEGEND_HTML;
+  });
 }
 
 window.switchTab=function(id){
@@ -693,7 +700,13 @@ function mkCleanBox(cls,title,items){
     const allDone=Object.values(cleanCk).filter(v=>v).length===total;
     if(!allDone)return;
     const r=rooms[curId];
-    r.type='green';r.greenSince=Date.now();r.name=r.owner||'';r.from='';r.to='';
+    // Mark as available — keep name/notes, only clear dates and reset status
+    r.type='green';
+    r.greenSince=Date.now();
+    r.from='';
+    r.to='';
+    // Only restore owner name if it's a priest room, otherwise keep existing name
+    if(r.roomType==='priest'&&r.owner) r.name=r.owner;
     saveToDB(r);renderAll();closeModal();showToast('Room cleaned & available ✓');
   });
   box.appendChild(btn);return box;
@@ -822,7 +835,6 @@ function openSheet(){
 
 window.doRoomRefreshed=function(){
   const r=rooms[curId];if(!r)return;
-  // Reset the green timer — dot disappears, 2 weeks start again
   r.greenSince=Date.now();
   saveToDB(r);renderAll();closeModal();
   showToast('Timer reset — room refreshed ✓');
@@ -830,8 +842,13 @@ window.doRoomRefreshed=function(){
 window.setManualClean=function(type){
   const r=rooms[curId];if(!r)return;
   r.type=type;
-  if(type==='green'){r.greenSince=Date.now();r.from='';r.to='';}
-  else{r.greenSince=null;}
+  if(type==='green'){
+    r.greenSince=Date.now();
+    r.from=''; r.to='';
+    if(r.roomType==='priest'&&r.owner) r.name=r.owner;
+  } else {
+    r.greenSince=null;
+  }
   saveToDB(r);renderAll();closeModal();
   const labels={red:'Deep clean set 🧹',violet:'Light refresh set 🪣',green:'Marked as available ✓'};
   showToast(labels[type]||'Updated');
