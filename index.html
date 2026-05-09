@@ -448,43 +448,50 @@ onAuthStateChanged(auth,user=>{
 
 function initApp(){
   loadSavedLayouts(()=>{
-onValue(ref(db,DB_KEY), snap=>{
-  const data=snap.val();
-  // Build rooms from Firebase data (or defaults if empty)
-  rooms={};
-  allRoomDefs().forEach(d=>{
-    const s = data ? data[d.id] : null;
-    if(s && s.configured){
-      rooms[d.id]={
-        id:d.id, floor:d.floor,
-        type:       s.type       ||'',
-        roomType:   s.roomType   ||null,
-        name:       s.name       ||'',
-        owner:      s.owner      ||null,
-        from:       s.from       ||'',
-        to:         s.to         ||'',
-        notes:      s.notes      ||'',
-        carpet:     s.carpet     !==undefined ? s.carpet : true,
-        greenSince: s.greenSince ||null,
-        configured: true,
-      };
-    } else {
-      rooms[d.id]=mkDef(d);
-    }
+    onValue(ref(db,DB_KEY), snap=>{
+      try{
+        const data=snap.val();
+        rooms={};
+        allRoomDefs().forEach(d=>{
+          const s = data ? data[d.id] : null;
+          if(s && s.configured){
+            rooms[d.id]={
+              id:d.id, floor:d.floor,
+              type:       s.type       ||'',
+              roomType:   s.roomType   ||null,
+              name:       s.name       ||'',
+              owner:      s.owner      ||null,
+              from:       s.from       ||'',
+              to:         s.to         ||'',
+              notes:      s.notes      ||'',
+              carpet:     s.carpet     !==undefined ? s.carpet : true,
+              greenSince: s.greenSince ||null,
+              configured: true,
+              _prevType:  s._prevType  ||null,
+            };
+          } else {
+            rooms[d.id]=mkDef(d);
+          }
+        });
+        if(!data){
+          const init={};
+          Object.values(rooms).forEach(r=>{ init[r.id]=r; });
+          set(ref(db,DB_KEY),init);
+        }
+        checkTimers();
+        renderAll();
+        setSyncStatus('ok');
+        if(!appReady){
+          document.getElementById('loading').style.display='none';
+          appReady=true;
+        }
+      }catch(err){
+        console.error('App error:',err);
+        setSyncStatus('err');
+      }
+    }, err=>{ console.error('Firebase error:',err); setSyncStatus('err'); });
   });
-  // If Firebase was empty, write all defaults now
-  if(!data){
-    const init={};
-    Object.values(rooms).forEach(r=>{ init[r.id]=r; });
-    set(ref(db,DB_KEY),init);
-  }
-  checkTimers(); renderAll(); setSyncStatus('ok');
-  console.log('Rooms loaded:', Object.keys(rooms).length, 'rooms. Sample:', rooms['f1-a1']);
-  if(!appReady){
-    document.getElementById('loading').style.display='none';
-    appReady=true;
-  }
-},()=>setSyncStatus('err'));
+} // end initApp
 
 function mkDef(d){
   // Pre-configured defaults based on the house layout
@@ -1218,8 +1225,6 @@ document.addEventListener('keydown',e=>{
 });
 setSyncStatus('saving');
 setInterval(()=>{checkTimers();renderAll();},30*60*1000);
-}); // end loadSavedLayouts
-} // end initApp
 
 document.getElementById('date-chip').textContent=
   new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
