@@ -740,8 +740,12 @@ window.switchTab=function(id){
   document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['f1','f2','si'][i]===id));
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  currentEditFloor = id; // track which floor is being edited
-  if(editMode) renderEditGrid();
+  if(editMode){
+    currentEditFloor = id;
+    // Make sure editLayouts has this floor
+    if(!editLayouts[id]) editLayouts[id] = JSON.parse(JSON.stringify(id==='si'?(window.SI||[]):id==='f2'?F2:F1));
+    renderEditGrid();
+  }
 };
 
 // ── MAP EDITOR ────────────────────────────────────────────
@@ -773,7 +777,11 @@ window.toggleEditMode=function(){
       si: JSON.parse(JSON.stringify(window.SI||[])),
     };
     selectedTile = null;
-    currentEditFloor = document.querySelector('.tab-btn.active')?.textContent.includes('1') ? 'f1' : 'f2';
+    // Detect active tab correctly — handles 1st Floor, 2nd Floor, Sisters
+    const activeTabText = document.querySelector('.tab-btn.active')?.textContent.trim() || '';
+    if(activeTabText.includes('2nd')) currentEditFloor = 'f2';
+    else if(activeTabText.toLowerCase().includes('sister')) currentEditFloor = 'si';
+    else currentEditFloor = 'f1';
     btn.textContent = '✕ Cancel Edit';
     btn.style.borderColor = 'var(--red)'; btn.style.color = 'var(--red)';
     panel.style.display = 'block';
@@ -874,11 +882,24 @@ function renderEditGrid(){
       el.innerHTML=`<div class="delete-overlay">🗑</div>`;
     } else if(d.kind==='room'){
       el=buildCell(rooms[d.id],pl);
-      if(el){const ov=document.createElement('div');ov.className='delete-overlay';ov.textContent='🗑';el.appendChild(ov);}
+      if(el){
+        // Override the openModal onclick set by buildCell
+        el.onclick=null;
+        const ov=document.createElement('div');
+        ov.className='delete-overlay';
+        ov.textContent='🗑';
+        el.appendChild(ov);
+      }
     }
     if(el){
       el.style.cursor='pointer';
-      el.addEventListener('click',()=>{ if(confirm('Remove this cell?')){ editLayouts[floor].splice(idx,1); renderEditGrid(); } });
+      // Single click = delete immediately, no confirm, no modal
+      el.addEventListener('click', e=>{
+        e.stopPropagation();
+        editLayouts[floor].splice(idx,1);
+        renderEditGrid();
+        showToast('Cell removed');
+      });
       gridEl.appendChild(el);
     }
   });
